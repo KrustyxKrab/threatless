@@ -1,0 +1,870 @@
+/* ============================================================================
+   SPREUWEIZEN — RECONSTRUCTED WEB DESIGN SYSTEM
+   Reference: https://spreuweizen.de/  |  Snapshot researched: 2026-11-16
+   Scope: start page, workshop detail pages, material library, team, navigation,
+          footer, forms and reusable editorial components.
+   Implementation: semantic HTML / React / Vue. No Elementor dependency.
+
+   EVIDENCE LEVELS
+   [OBSERVED]  Actual public page / WordPress-rendered markup, e.g. Elementor
+               accordion <details>, pixelated inline-SVG arrows, source assets.
+   [INFERRED]  Visual and design-system approximation. Exact compiled CSS,
+               rendered screenshots and font metadata could not be inspected.
+   [CUSTOM]    Accessibility / responsiveness / component utilities added for
+               a production-ready reimplementation (not claimed as original).
+
+   The values below are a faithful *interpretation*, NOT an export of the
+   original site's computed CSS. Confirm font names, hex codes, spacing, and
+   hero backgrounds against the live website before pixel-perfect production.
+
+   ASSUMED MARKUP:
+      <div class="sw-site">
+        <header class="sw-header">...</header>
+        <main>...</main>
+        <footer class="sw-footer">...</footer>
+      </div>
+
+   All application-specific classes are prefixed sw-. Keep external fonts and
+   original artwork licensed/attributed as necessary before republishing.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   01. BRAND TOKENS / COLOR SYSTEM
+   Palette is inferred from identifiable public SPREUWEIZEN artwork.
+   Strong black, clean white, aqua/turquoise, signal pink and bright yellow.
+   --------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  /* Core colors [INFERRED] — exact reference HEX not obtainable */
+  --sw-ink: #111111;
+  --sw-black: #080808;
+  --sw-white: #ffffff;
+  --sw-canvas: #ffffff;
+  --sw-paper: #f7f6f2;
+  --sw-gray-050: #fafaf9;
+  --sw-gray-100: #f1f1ef;
+  --sw-gray-200: #dededb;
+  --sw-gray-300: #c6c6c2;
+  --sw-gray-500: #757571;
+  --sw-gray-700: #444442;
+  --sw-teal: #00b4ad;
+  --sw-teal-light: #b4ece7;
+  --sw-teal-dark: #007e79;
+  --sw-pink: #ec3075;
+  --sw-pink-light: #ffb5d0;
+  --sw-yellow: #ffe047;
+  --sw-lilac: #c9b3f2;
+  --sw-error: #bd214e;
+  --sw-success: #006a52;
+
+  /* Semantic colors */
+  --sw-color-text: var(--sw-ink);
+  --sw-color-text-subtle: var(--sw-gray-700);
+  --sw-color-page: var(--sw-canvas);
+  --sw-color-surface: var(--sw-white);
+  --sw-color-section-alt: var(--sw-paper);
+  --sw-color-border: var(--sw-ink);
+  --sw-color-focus: var(--sw-pink);
+  --sw-color-selection: var(--sw-yellow);
+  --sw-color-highlight: var(--sw-teal);
+
+  /* Typography [INFERRED]. Set custom fonts here once identified. */
+  --sw-font-display: "Archivo", "Arial Black", Arial, sans-serif;
+  --sw-font-heading: "Archivo", Arial, sans-serif;
+  --sw-font-body: "Archivo", Arial, sans-serif;
+  --sw-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --sw-weight-body: 400;
+  --sw-weight-medium: 600;
+  --sw-weight-bold: 800;
+  --sw-weight-heavy: 900;
+  --sw-track-display: -0.055em;
+  --sw-track-heading: -0.03em;
+  --sw-track-caps: -0.025em;
+
+  /* Fluid sizes; nominal desktop sizes approximate, not site measurements. */
+  --sw-text-xs: clamp(0.72rem, 0.68rem + 0.18vw, 0.82rem);
+  --sw-text-sm: clamp(0.82rem, 0.77rem + 0.2vw, 0.92rem);
+  --sw-text-base: clamp(1rem, 0.94rem + 0.23vw, 1.125rem);
+  --sw-text-lg: clamp(1.125rem, 1.03rem + 0.45vw, 1.45rem);
+  --sw-text-xl: clamp(1.3rem, 1.07rem + 0.95vw, 2.05rem);
+  --sw-text-h3: clamp(1.65rem, 1.22rem + 2vw, 3.15rem);
+  --sw-text-h2: clamp(2.5rem, 1.3rem + 4.6vw, 5.6rem);
+  --sw-text-h1: clamp(3.45rem, 1.5rem + 7.5vw, 9.5rem);
+  --sw-text-hero: clamp(4.5rem, 1.25rem + 12vw, 13rem);
+  --sw-leading-tight: 0.94;
+  --sw-leading-heading: 1.02;
+  --sw-leading-body: 1.48;
+  --sw-leading-reading: 1.64;
+
+  /* Spatial rhythm: 4px basis, strongly modular. [INFERRED] */
+  --sw-space-0: 0;
+  --sw-space-1: 0.25rem;
+  --sw-space-2: 0.5rem;
+  --sw-space-3: 0.75rem;
+  --sw-space-4: 1rem;
+  --sw-space-5: 1.25rem;
+  --sw-space-6: 1.5rem;
+  --sw-space-8: 2rem;
+  --sw-space-10: 2.5rem;
+  --sw-space-12: 3rem;
+  --sw-space-16: 4rem;
+  --sw-space-20: 5rem;
+  --sw-space-24: 6rem;
+  --sw-space-28: 7rem;
+  --sw-space-32: 8rem;
+  --sw-gutter: clamp(1.125rem, 3vw, 3.5rem);
+  --sw-section-block: clamp(4rem, 8vw, 9.5rem);
+  --sw-content-width: 1320px;
+  --sw-reading-width: 720px;
+  --sw-grid-gap: clamp(1.25rem, 2vw, 2.75rem);
+  --sw-header-height: clamp(4.25rem, 6vw, 6.25rem);
+
+  /* Edges: rectangular, intentionally minimal rounding. [INFERRED] */
+  --sw-stroke-hairline: 1px;
+  --sw-stroke: 2px;
+  --sw-stroke-strong: 3px;
+  --sw-radius-none: 0;
+  --sw-radius-slight: 2px;
+  --sw-radius-pill: 999px; /* Only on UI chips, not brand panels */
+  --sw-shadow-hard: 0.45rem 0.45rem 0 0 var(--sw-ink);
+  --sw-shadow-hard-pink: 0.45rem 0.45rem 0 0 var(--sw-pink);
+  --sw-shadow-hard-teal: 0.45rem 0.45rem 0 0 var(--sw-teal);
+
+  /* Timing */
+  --sw-ease: cubic-bezier(0.25, 0.85, 0.25, 1);
+  --sw-ease-snap: cubic-bezier(0.18, 0.9, 0.22, 1);
+  --sw-fast: 160ms;
+  --sw-normal: 280ms;
+  --sw-slow: 450ms;
+
+  /* Observed native image sources from public WordPress page content. */
+  --sw-asset-hero-gif: url("https://spreuweizen.de/wp-content/uploads/2025/03/25-03_zwinki.gif");
+  --sw-asset-push-bis-print: url("https://spreuweizen.de/wp-content/uploads/2025/02/Lua_PushbisPrint_web-914x1024.png");
+  --sw-asset-influencing: url("https://spreuweizen.de/wp-content/uploads/2025/02/Ina_Influencing_web-914x1024.png");
+  --sw-asset-fakt-oder-fake: url("https://spreuweizen.de/wp-content/uploads/2025/02/Freddy_FaktoderFake_web-914x1024.png");
+  --sw-asset-meinungsstark: url("https://spreuweizen.de/wp-content/uploads/2026/06/Kinder_Malik_Meinung-914x1024.png");
+  --sw-asset-favicon: url("https://spreuweizen.de/wp-content/uploads/2020/07/fave-blk.png");
+
+  /* Other section imagery: provide real URLs from Media Library as needed. */
+  --sw-asset-pressefreiheit: none;
+  --sw-asset-ki-und-demokratie: none;
+  --sw-asset-eilmeldung: none;
+  --sw-asset-exit-to-exile: none;
+  --sw-asset-macht-und-meinung: none;
+  --sw-asset-tiktalkshow: none;
+  --sw-asset-nachrichtenwelt: none;
+  --sw-asset-wahr-oder-falsch: none;
+  --sw-asset-desinformation: none;
+}
+
+/* ---------------------------------------------------------------------------
+   02. BASE / RESET / WEB ACCESSIBILITY
+   --------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--sw-header-height) + 1rem); }
+body { margin: 0; min-width: 320px; }
+body, button, input, textarea, select { font-family: var(--sw-font-body); }
+.sw-site {
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: clip;
+  background: var(--sw-color-page);
+  color: var(--sw-color-text);
+  font-size: var(--sw-text-base);
+  line-height: var(--sw-leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.sw-site :where(h1, h2, h3, h4, p, figure, blockquote, ul, ol) { margin-block: 0; }
+.sw-site :where(h1, h2, h3, h4) { color: inherit; }
+.sw-site :where(ul, ol) { padding-inline-start: 1.4em; }
+.sw-site :where(img, video, svg, canvas) { max-width: 100%; }
+.sw-site :where(img, video) { display: block; height: auto; }
+.sw-site :where(button, select, input, textarea) { font: inherit; }
+.sw-site :where(button, a, summary, input, select, textarea) { -webkit-tap-highlight-color: transparent; }
+.sw-site :where(button, [role="button"], summary) { cursor: pointer; }
+.sw-site :where(a) { color: inherit; text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+.sw-site :where(a:hover) { text-decoration-color: var(--sw-pink); }
+.sw-site ::selection { background: var(--sw-color-selection); color: var(--sw-black); }
+.sw-site :focus-visible { outline: 3px solid var(--sw-color-focus); outline-offset: 4px; }
+.sw-site [hidden], .sw-site .sw-hidden { display: none !important; }
+.sw-site .sw-sr-only {
+  position: absolute !important; width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+  clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important;
+}
+.sw-skip-link {
+  position: fixed; top: 0.75rem; left: 0.75rem; z-index: 2000;
+  padding: 0.75rem 1rem; color: var(--sw-white); background: var(--sw-black);
+  transform: translateY(-200%);
+}
+.sw-skip-link:focus { transform: translateY(0); }
+
+/* ---------------------------------------------------------------------------
+   03. TYPE SYSTEM
+   Large all-cap headlines, editorial body, compact metadata, high contrast.
+   --------------------------------------------------------------------------- */
+.sw-display, .sw-h1, .sw-h2, .sw-h3,
+.sw-site h1.sw-title, .sw-site h2.sw-title, .sw-site h3.sw-title {
+  font-family: var(--sw-font-display);
+  font-weight: var(--sw-weight-heavy);
+  letter-spacing: var(--sw-track-display);
+  line-height: var(--sw-leading-tight);
+  text-wrap: balance;
+}
+.sw-display { font-size: var(--sw-text-hero); text-transform: uppercase; }
+.sw-h1, .sw-site h1.sw-title { font-size: var(--sw-text-h1); text-transform: uppercase; }
+.sw-h2, .sw-site h2.sw-title { font-size: var(--sw-text-h2); text-transform: uppercase; }
+.sw-h3, .sw-site h3.sw-title { font-size: var(--sw-text-h3); text-transform: uppercase; }
+.sw-kicker, .sw-eyebrow, .sw-label {
+  font-weight: var(--sw-weight-bold); text-transform: uppercase;
+  letter-spacing: 0.045em; line-height: 1.15;
+}
+.sw-kicker { font-size: var(--sw-text-sm); }
+.sw-eyebrow { font-size: var(--sw-text-lg); }
+.sw-deck { font-size: var(--sw-text-xl); font-weight: var(--sw-weight-medium); line-height: 1.26; }
+.sw-lead { font-size: var(--sw-text-lg); line-height: 1.4; letter-spacing: -0.01em; }
+.sw-copy, .sw-richtext { font-size: var(--sw-text-base); line-height: var(--sw-leading-reading); }
+.sw-copy--narrow, .sw-richtext--narrow { max-width: 68ch; }
+.sw-meta { font-size: var(--sw-text-sm); font-weight: var(--sw-weight-bold); letter-spacing: 0.015em; }
+.sw-caption { font-size: var(--sw-text-xs); line-height: 1.35; }
+.sw-richtext > * + * { margin-block-start: 1em; }
+.sw-richtext > :is(h2, h3) { margin-block-start: 1.75em; }
+.sw-richtext strong { font-weight: var(--sw-weight-bold); }
+.sw-richtext a { text-decoration-color: var(--sw-teal); }
+.sw-richtext blockquote {
+  margin-block: var(--sw-space-10); padding-inline-start: 1.2em;
+  border-inline-start: 0.25rem solid var(--sw-pink);
+  font-size: var(--sw-text-xl); font-weight: 700; line-height: 1.25;
+}
+
+/* ---------------------------------------------------------------------------
+   04. LAYOUT, GRID, SECTION UTILITIES
+   --------------------------------------------------------------------------- */
+.sw-container { width: min(calc(100% - 2 * var(--sw-gutter)), var(--sw-content-width)); margin-inline: auto; }
+.sw-reading { width: min(100%, var(--sw-reading-width)); }
+.sw-section { position: relative; padding-block: var(--sw-section-block); }
+.sw-section--tight { padding-block: clamp(2.5rem, 5vw, 5rem); }
+.sw-section--black { color: var(--sw-white); background: var(--sw-black); }
+.sw-section--teal { color: var(--sw-ink); background: var(--sw-teal); }
+.sw-section--pink { color: var(--sw-ink); background: var(--sw-pink); }
+.sw-section--yellow { color: var(--sw-ink); background: var(--sw-yellow); }
+.sw-section--paper { background: var(--sw-paper); }
+.sw-section__head { display: grid; gap: var(--sw-space-6); margin-bottom: clamp(2.5rem, 6vw, 5rem); }
+.sw-section__head--split { grid-template-columns: minmax(0, 1.1fr) minmax(250px, 0.9fr); align-items: end; }
+.sw-grid { display: grid; gap: var(--sw-grid-gap); }
+.sw-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sw-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sw-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sw-flex { display: flex; gap: var(--sw-space-4); align-items: center; }
+.sw-stack > * + * { margin-block-start: var(--sw-stack-gap, var(--sw-space-6)); }
+.sw-rule { height: 2px; border: 0; background: currentColor; }
+.sw-divider { border: 0; border-top: var(--sw-stroke) solid var(--sw-color-border); }
+.sw-separator { display: block; width: 100%; height: var(--sw-stroke); background: currentColor; }
+.sw-fullbleed { width: 100vw; margin-inline: calc(50% - 50vw); }
+.sw-align-end { text-align: end; }
+.sw-align-center { text-align: center; }
+.sw-push-end { margin-left: auto; }
+
+/* Blocky stickers and decorative elements [INFERRED]. */
+.sw-sticker {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.6em 0.85em; border: var(--sw-stroke-strong) solid var(--sw-ink);
+  border-radius: var(--sw-radius-none); font: 900 var(--sw-text-sm)/1 var(--sw-font-heading);
+  text-transform: uppercase; background: var(--sw-yellow); box-shadow: var(--sw-shadow-hard);
+  transform: rotate(-3deg);
+}
+.sw-sticker--pink { background: var(--sw-pink); transform: rotate(4deg); }
+.sw-sticker--teal { background: var(--sw-teal); transform: rotate(-2deg); }
+.sw-pixel-grid {
+  background-image: linear-gradient(to right, rgb(17 17 17 / 8%) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgb(17 17 17 / 8%) 1px, transparent 1px);
+  background-size: 1.5rem 1.5rem;
+}
+.sw-steps {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, calc(100% - 14px) 7px,
+     calc(100% - 7px) 7px, calc(100% - 7px) 14px, 100% 14px,
+     100% 100%, 14px 100%, 14px calc(100% - 7px),
+     7px calc(100% - 7px), 7px calc(100% - 14px), 0 calc(100% - 14px));
+}
+
+/* ---------------------------------------------------------------------------
+   05. BUTTONS / LINKS / PIXEL UI
+   [OBSERVED] Original site uses pixelated, rectangular SVG arrow pictograms.
+   This data SVG is a compact redraw of the observed 13.1 x 13.1 arrow geometry.
+   --------------------------------------------------------------------------- */
+.sw-button, .sw-link-button, .sw-site .elementor-button.sw-button {
+  --sw-button-bg: var(--sw-ink);
+  --sw-button-fg: var(--sw-white);
+  --sw-button-border: var(--sw-ink);
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-wrap: nowrap; gap: 0.8em;
+  min-height: 3.1rem; width: fit-content; max-width: 100%;
+  padding: 0.8rem 1.2rem; border: var(--sw-stroke) solid var(--sw-button-border);
+  border-radius: var(--sw-radius-none);
+  color: var(--sw-button-fg); background: var(--sw-button-bg);
+  font-family: var(--sw-font-heading); font-size: var(--sw-text-sm);
+  font-weight: var(--sw-weight-bold); line-height: 1.1;
+  text-transform: uppercase; text-align: center; letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: transform var(--sw-fast) var(--sw-ease),
+              background-color var(--sw-fast), color var(--sw-fast),
+              box-shadow var(--sw-fast);
+}
+.sw-button:hover { transform: translate(-3px, -3px); box-shadow: 4px 4px 0 var(--sw-pink); text-decoration: none; }
+.sw-button:active { transform: translate(0, 0); box-shadow: none; }
+.sw-button:disabled { cursor: not-allowed; opacity: 0.5; transform: none; box-shadow: none; }
+.sw-button--light { --sw-button-bg: var(--sw-white); --sw-button-fg: var(--sw-ink); }
+.sw-button--outline { --sw-button-bg: transparent; --sw-button-fg: var(--sw-ink); }
+.sw-button--teal { --sw-button-bg: var(--sw-teal); --sw-button-fg: var(--sw-ink); }
+.sw-button--pink { --sw-button-bg: var(--sw-pink); --sw-button-fg: var(--sw-ink); }
+.sw-button--yellow { --sw-button-bg: var(--sw-yellow); --sw-button-fg: var(--sw-ink); }
+.sw-button--inverse { --sw-button-bg: var(--sw-white); --sw-button-fg: var(--sw-ink); --sw-button-border: var(--sw-white); }
+.sw-button--lg { min-height: 3.8rem; padding: 1rem 1.55rem; font-size: var(--sw-text-base); }
+.sw-button--sm { min-height: 2.4rem; padding: 0.55rem 0.8rem; }
+.sw-button--arrow::after, .sw-arrow::after {
+  content: ""; display: inline-block; width: 1.15em; height: 1.15em;
+  flex: 0 0 auto; background-color: currentColor;
+  clip-path: polygon(45% 0, 60% 0, 60% 15%, 75% 15%, 75% 30%, 90% 30%,
+    90% 42%, 100% 42%, 100% 58%, 90% 58%, 90% 70%, 75% 70%,
+    75% 85%, 60% 85%, 60% 100%, 45% 100%, 45% 60%, 0 60%, 0 40%, 45% 40%);
+  transition: transform var(--sw-fast) var(--sw-ease);
+}
+.sw-button--arrow:hover::after, .sw-arrow:hover::after { transform: translateX(0.2em); }
+.sw-arrow--down::after { transform: rotate(90deg); }
+.sw-arrow--down:hover::after { transform: rotate(90deg) translateX(0.2em); }
+.sw-arrow--back::after { transform: rotate(180deg); }
+.sw-text-link {
+  display: inline-flex; align-items: center; gap: 0.6em;
+  width: fit-content; font-weight: 800; text-decoration: none;
+  border-bottom: var(--sw-stroke) solid currentColor;
+  transition: color var(--sw-fast), gap var(--sw-fast);
+}
+.sw-text-link:hover { color: var(--sw-pink); gap: 0.85em; }
+.sw-icon-button {
+  display: grid; place-items: center; width: 3rem; height: 3rem;
+  border: var(--sw-stroke) solid currentColor; border-radius: 0;
+  color: inherit; background: transparent; transition: background var(--sw-fast);
+}
+.sw-icon-button:hover { color: var(--sw-ink); background: var(--sw-teal); }
+.sw-icon-button svg { width: 1.4rem; height: 1.4rem; fill: currentColor; }
+
+/* ---------------------------------------------------------------------------
+   06. SITE NAVIGATION / MENU OVERLAY / BACK LINK
+   [OBSERVED] Desktop and inner pages offer a "Menü" control; an inner-page
+   back control is present. Overlay mechanics require JS (class is-open).
+   --------------------------------------------------------------------------- */
+.sw-header {
+  position: relative; z-index: 80; min-height: var(--sw-header-height);
+  display: flex; align-items: center;
+  border-bottom: var(--sw-stroke) solid var(--sw-ink);
+  background: var(--sw-white); color: var(--sw-ink);
+}
+.sw-header--overlay {
+  position: absolute; inset: 0 0 auto;
+  background: transparent; border-bottom: 0;
+}
+.sw-header--sticky { position: sticky; inset-block-start: 0; }
+.sw-header__inner {
+  display: flex; width: min(calc(100% - 2 * var(--sw-gutter)), var(--sw-content-width));
+  margin-inline: auto; align-items: center; justify-content: space-between;
+  gap: var(--sw-space-5);
+}
+.sw-brand { display: inline-flex; align-items: center; gap: 1rem; text-decoration: none; }
+.sw-brand__wordmark {
+  font-family: var(--sw-font-display); font-size: clamp(1.2rem, 1.55vw, 1.85rem);
+  font-weight: 900; letter-spacing: -0.075em; line-height: 1; text-transform: uppercase;
+}
+.sw-brand__mark { display: block; width: clamp(2.2rem, 3vw, 3.5rem); aspect-ratio: 1; object-fit: contain; }
+.sw-brand__tagline { font-size: var(--sw-text-xs); font-weight: 700; line-height: 1.2; }
+.sw-header__actions { display: flex; align-items: center; gap: var(--sw-space-4); }
+.sw-nav { display: flex; gap: clamp(1rem, 2vw, 2.5rem); align-items: center; }
+.sw-nav a {
+  font-size: var(--sw-text-sm); font-weight: 800; text-decoration: none;
+  text-transform: uppercase; line-height: 1;
+}
+.sw-nav a:hover, .sw-nav a[aria-current="page"] { color: var(--sw-pink); }
+.sw-menu-toggle {
+  display: inline-flex; align-items: center; gap: var(--sw-space-3);
+  padding: 0.6rem 0; border: 0; background: transparent;
+  color: inherit; font-size: var(--sw-text-sm); font-weight: 900; text-transform: uppercase;
+}
+.sw-menu-toggle__glyph { position: relative; width: 1.45rem; height: 1rem; }
+.sw-menu-toggle__glyph::before, .sw-menu-toggle__glyph::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 3px; background: currentColor;
+  transition: transform var(--sw-normal), top var(--sw-normal);
+}
+.sw-menu-toggle__glyph::before { top: 0.18rem; }
+.sw-menu-toggle__glyph::after { top: 0.72rem; }
+.sw-menu-toggle[aria-expanded="true"] .sw-menu-toggle__glyph::before { top: 0.45rem; transform: rotate(45deg); }
+.sw-menu-toggle[aria-expanded="true"] .sw-menu-toggle__glyph::after { top: 0.45rem; transform: rotate(-45deg); }
+.sw-back { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 800; }
+.sw-back::before { content: "←"; font-weight: 900; font-size: 1.35em; }
+.sw-menu-panel {
+  position: fixed; z-index: 70; inset: 0; overflow-y: auto;
+  padding: calc(var(--sw-header-height) + 3rem) var(--sw-gutter) 4rem;
+  background: var(--sw-teal); color: var(--sw-ink);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateY(-1.5rem);
+  transition: opacity var(--sw-normal), visibility var(--sw-normal), transform var(--sw-normal);
+}
+.sw-menu-panel.is-open { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+.sw-menu-panel__links { display: grid; max-width: 1200px; margin: 0 auto; }
+.sw-menu-panel__links a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: clamp(0.65rem, 1.5vw, 1.2rem) 0;
+  border-bottom: var(--sw-stroke-strong) solid currentColor;
+  font-family: var(--sw-font-display); font-weight: 900;
+  text-transform: uppercase; text-decoration: none;
+  letter-spacing: var(--sw-track-display); line-height: 0.95;
+  font-size: clamp(2.1rem, 5.5vw, 5.75rem);
+}
+.sw-menu-panel__links a:hover { color: var(--sw-white); }
+.sw-menu-panel__meta { margin-block-start: var(--sw-space-16); display: flex; justify-content: space-between; gap: var(--sw-space-4); }
+
+/* ---------------------------------------------------------------------------
+   07. HOME HERO / INTRO
+   [OBSERVED] Animated "zwinki" GIF 550 x 300; a scroll CTA labelled
+   "Scroll Licht ins Dunkel" linking to #los. Original precise positioning,
+   background color and responsive behavior must be checked visually.
+   --------------------------------------------------------------------------- */
+.sw-hero {
+  position: relative; isolation: isolate;
+  display: grid; align-items: center; justify-items: center;
+  min-height: min(900px, 96svh); overflow: clip;
+  padding: calc(var(--sw-header-height) + 3rem) var(--sw-gutter) 4rem;
+  color: var(--sw-white); background: var(--sw-black);
+  text-align: center;
+}
+.sw-hero--light { color: var(--sw-ink); background: var(--sw-white); }
+.sw-hero--teal { color: var(--sw-ink); background: var(--sw-teal); }
+.sw-hero__inner { position: relative; z-index: 1; width: min(100%, 980px); display: grid; place-items: center; gap: var(--sw-space-8); }
+.sw-hero__image { display: block; width: min(75vw, 550px); max-height: 48svh; object-fit: contain; }
+.sw-hero__gif {
+  width: min(75vw, 550px); min-height: 230px;
+  background-image: var(--sw-asset-hero-gif);
+  background-position: center; background-repeat: no-repeat; background-size: contain;
+}
+.sw-hero__scroll { margin-top: var(--sw-space-8); }
+.sw-hero__scroll .sw-button { border-color: currentColor; }
+.sw-hero__corner {
+  position: absolute; pointer-events: none; z-index: 0;
+  width: clamp(4rem, 11vw, 10rem); aspect-ratio: 1;
+  background: var(--sw-pink); clip-path: polygon(0 0, 100% 0, 100% 24%, 24% 24%, 24% 100%, 0 100%);
+}
+.sw-hero__corner--tl { top: 10%; left: 4%; }
+.sw-hero__corner--br { bottom: 8%; right: 4%; transform: rotate(180deg); background: var(--sw-yellow); }
+.sw-intro {
+  position: relative; padding-block: clamp(5rem, 11vw, 12rem);
+  background: var(--sw-white); color: var(--sw-ink);
+}
+.sw-intro__statement {
+  max-width: 1120px; font-family: var(--sw-font-heading);
+  font-size: clamp(1.65rem, 2.7vw, 3.6rem);
+  font-weight: 700; line-height: 1.22; letter-spacing: -0.04em;
+  text-wrap: pretty;
+}
+.sw-intro__statement strong { font-weight: 900; }
+.sw-intro__decor { position: absolute; right: 5%; bottom: 7%; width: clamp(4rem, 7vw, 8rem); transform: rotate(-7deg); }
+
+/* ---------------------------------------------------------------------------
+   08. OFFER CATEGORIES / WORKSHOP LIST
+   [OBSERVED] Site categories: Jugendliche, Kinder, Fachkräfte. Each offering
+   shows uppercase title, expandable descriptive panel, illustration and
+   duration, plus "Hier buchen" link. Mobile/site markup uses Elementor
+   <details> nested accordions; these semantic details work without JS.
+   --------------------------------------------------------------------------- */
+.sw-offers { background: var(--sw-white); }
+.sw-offers__heading { display: grid; gap: var(--sw-space-8); margin-bottom: var(--sw-space-12); }
+.sw-offers__title { font-size: clamp(2.5rem, 6vw, 7rem); text-transform: uppercase; }
+.sw-tabs { display: flex; align-items: center; gap: 0; flex-wrap: wrap; border-bottom: var(--sw-stroke-strong) solid var(--sw-ink); }
+.sw-tabs__button, .sw-tab {
+  position: relative; display: inline-flex; align-items: center;
+  padding: 0.85rem clamp(0.9rem, 2vw, 2rem);
+  border: 0; border-right: 1px solid var(--sw-ink);
+  background: transparent; color: var(--sw-ink);
+  font-weight: 900; font-size: clamp(1rem, 1.65vw, 1.75rem);
+  text-transform: uppercase; letter-spacing: -0.035em;
+  transition: color var(--sw-fast), background var(--sw-fast);
+}
+.sw-tabs__button:first-child, .sw-tab:first-child { padding-left: 0; }
+.sw-tabs__button:last-child, .sw-tab:last-child { border-right: 0; }
+.sw-tabs__button:hover, .sw-tab:hover { background: var(--sw-yellow); }
+.sw-tabs__button[aria-selected="true"], .sw-tab.is-active { color: var(--sw-white); background: var(--sw-ink); }
+.sw-tab-panel[hidden] { display: none; }
+.sw-offer-list { display: grid; gap: 0; }
+.sw-offer {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  align-items: stretch; gap: clamp(1rem, 4vw, 5rem);
+  min-height: clamp(365px, 42vw, 630px);
+  padding: clamp(2.75rem, 5vw, 6rem) 0;
+  border-bottom: var(--sw-stroke-strong) solid var(--sw-ink);
+}
+.sw-offer:nth-child(even) .sw-offer__media { order: -1; }
+.sw-offer__content { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.sw-offer__title {
+  margin-bottom: clamp(1rem, 2vw, 2.2rem);
+  font-family: var(--sw-font-display); font-size: clamp(2.4rem, 4vw, 5.4rem);
+  line-height: 0.96; letter-spacing: -0.055em; font-weight: 900; text-transform: uppercase;
+}
+.sw-offer__subtitle { font-size: var(--sw-text-xl); font-weight: 900; letter-spacing: -0.035em; line-height: 1.1; }
+.sw-offer__description { max-width: 55ch; margin-top: var(--sw-space-6); line-height: 1.55; }
+.sw-offer__actions { display: flex; flex-wrap: wrap; gap: var(--sw-space-6); margin-top: var(--sw-space-8); }
+.sw-offer__duration {
+  margin-top: auto; padding-top: var(--sw-space-8);
+  font-size: var(--sw-text-sm); font-weight: 900; letter-spacing: -0.005em;
+}
+.sw-offer__duration::before { content: "◼"; margin-right: 0.65em; font-size: 0.75em; }
+.sw-offer__media { display: grid; place-items: center; min-height: 260px; overflow: visible; }
+.sw-offer__art {
+  width: min(100%, 470px); aspect-ratio: 914 / 1024; margin-inline: auto;
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  transition: transform var(--sw-slow) var(--sw-ease-snap);
+}
+.sw-offer:hover .sw-offer__art { transform: rotate(-2deg) scale(1.025); }
+.sw-offer__art img { width: 100%; height: 100%; object-fit: contain; }
+.sw-offer__art--push { background-image: var(--sw-asset-push-bis-print); }
+.sw-offer__art--influencing { background-image: var(--sw-asset-influencing); }
+.sw-offer__art--fake { background-image: var(--sw-asset-fakt-oder-fake); }
+.sw-offer__art--meinung { background-image: var(--sw-asset-meinungsstark); }
+.sw-offer__art--presse { background-image: var(--sw-asset-pressefreiheit); }
+.sw-offer__art--ki { background-image: var(--sw-asset-ki-und-demokratie); }
+.sw-offer__art--eilmeldung { background-image: var(--sw-asset-eilmeldung); }
+.sw-offer__art--exit { background-image: var(--sw-asset-exit-to-exile); }
+.sw-offer__art--macht { background-image: var(--sw-asset-macht-und-meinung); }
+.sw-offer__art--talkshow { background-image: var(--sw-asset-tiktalkshow); }
+.sw-offer__art--nachrichtenwelt { background-image: var(--sw-asset-nachrichtenwelt); }
+.sw-offer__art--wahr { background-image: var(--sw-asset-wahr-oder-falsch); }
+.sw-offer__art--desinformation { background-image: var(--sw-asset-desinformation); }
+.sw-offer__art--missing { background-color: var(--sw-gray-100); border: 2px dashed var(--sw-gray-300); }
+.sw-offer--compact { min-height: 0; padding-block: var(--sw-space-10); }
+.sw-offer--compact .sw-offer__title { font-size: var(--sw-text-h3); }
+
+/* Native details variant [CUSTOM faithful to observed structural markup]. */
+.sw-accordion { border-top: var(--sw-stroke) solid var(--sw-ink); }
+.sw-accordion__item { border-bottom: var(--sw-stroke) solid var(--sw-ink); }
+.sw-accordion__item > summary {
+  display: flex; justify-content: space-between; gap: var(--sw-space-6);
+  padding: var(--sw-space-5) 0;
+  font-size: var(--sw-text-xl); font-weight: 900; line-height: 1.1;
+  list-style: none;
+}
+.sw-accordion__item > summary::-webkit-details-marker { display: none; }
+.sw-accordion__item > summary::after {
+  content: "+"; flex: 0 0 auto; font: 900 1.6em/0.8 var(--sw-font-heading);
+  transition: transform var(--sw-normal);
+}
+.sw-accordion__item[open] > summary::after { content: "−"; }
+.sw-accordion__body { padding-bottom: var(--sw-space-6); }
+.sw-accordion__body p { max-width: 62ch; }
+.sw-accordion__body .sw-button { margin-top: var(--sw-space-5); }
+
+/* Slightly opinionated Elementor class aliases, only when wrapped in .sw-site.
+   To restyle the *actual* hosted WP page, a genuine stylesheet audit is needed. */
+.sw-site .e-n-accordion-item-title { cursor: pointer; }
+.sw-site .e-n-accordion-item-title-icon svg { width: 1.25rem; height: 1.25rem; }
+.sw-site .elementor-button-content-wrapper { display: inline-flex; align-items: center; gap: 0.55rem; }
+.sw-site .elementor-button-icon svg { fill: currentColor; width: 1rem; height: 1rem; }
+
+/* ---------------------------------------------------------------------------
+   09. INNER PAGE HERO / WORKSHOP DETAIL / PROGRAMME
+   Observed: title, subtitle, lead, illustration, "Der Ablauf", booking form.
+   --------------------------------------------------------------------------- */
+.sw-page-header { padding-block: clamp(3.5rem, 7vw, 8rem); border-bottom: var(--sw-stroke-strong) solid var(--sw-ink); }
+.sw-page-header__grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr); gap: 4vw; align-items: center; }
+.sw-page-header__content { display: grid; gap: var(--sw-space-8); }
+.sw-page-header__title { overflow-wrap: anywhere; }
+.sw-page-header__subtitle { max-width: 30ch; font-size: var(--sw-text-xl); font-weight: 900; line-height: 1.15; }
+.sw-page-header__body { max-width: 62ch; }
+.sw-page-header__image { display: block; width: 100%; max-height: 620px; object-fit: contain; }
+.sw-program { display: grid; gap: var(--sw-space-10); }
+.sw-program__step { display: grid; grid-template-columns: minmax(70px, 0.17fr) minmax(0, 1fr); gap: 2vw; padding-bottom: var(--sw-space-10); border-bottom: 2px solid var(--sw-ink); }
+.sw-program__number { font: 900 var(--sw-text-h3)/1 var(--sw-font-display); letter-spacing: -0.05em; }
+.sw-program__title { font-size: var(--sw-text-xl); font-weight: 900; letter-spacing: -0.03em; }
+.sw-program__body { max-width: 72ch; margin-top: var(--sw-space-4); }
+.sw-program--cards { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
+.sw-program--cards .sw-program__step { display: block; padding: var(--sw-space-8); border: 2px solid var(--sw-ink); }
+.sw-program--cards .sw-program__number { margin-bottom: var(--sw-space-5); }
+.sw-booking { border-top: 3px solid var(--sw-ink); background: var(--sw-yellow); }
+.sw-booking__layout { display: grid; grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); gap: clamp(2.5rem, 5vw, 6rem); }
+.sw-booking__lead { position: sticky; top: calc(var(--sw-header-height) + 2rem); align-self: start; }
+
+/* ---------------------------------------------------------------------------
+   10. MATERIAL LIBRARY / HANDOUTS / EMBEDDED GAMES
+   Observed sections: Unterrichtspläne, Handouts, Games, Lexikon and forms.
+   --------------------------------------------------------------------------- */
+.sw-material-nav { display: flex; flex-wrap: wrap; gap: var(--sw-space-3); margin-block: var(--sw-space-12); }
+.sw-material-nav a { display: inline-block; padding: 0.75rem 1.1rem; border: 2px solid var(--sw-ink); text-decoration: none; font-weight: 900; text-transform: uppercase; }
+.sw-material-nav a:hover, .sw-material-nav a[aria-current="true"] { background: var(--sw-ink); color: var(--sw-white); }
+.sw-material-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--sw-grid-gap); }
+.sw-material-card { min-width: 0; display: flex; flex-direction: column; border: 2px solid var(--sw-ink); background: var(--sw-white); }
+.sw-material-card__cover { display: grid; place-items: center; min-height: 230px; aspect-ratio: 4 / 3; padding: var(--sw-space-6); background: var(--sw-teal-light); border-bottom: 2px solid var(--sw-ink); overflow: hidden; }
+.sw-material-card:nth-child(3n+2) .sw-material-card__cover { background: var(--sw-pink-light); }
+.sw-material-card:nth-child(3n+3) .sw-material-card__cover { background: var(--sw-yellow); }
+.sw-material-card__cover img { max-height: 360px; object-fit: contain; transition: transform var(--sw-normal); }
+.sw-material-card:hover .sw-material-card__cover img { transform: scale(1.04) rotate(-1deg); }
+.sw-material-card__body { display: flex; flex: 1; flex-direction: column; gap: var(--sw-space-4); padding: clamp(1rem, 2vw, 2rem); }
+.sw-material-card__title { font-size: var(--sw-text-xl); font-weight: 900; line-height: 1.1; letter-spacing: -0.035em; }
+.sw-material-card__body p { font-size: var(--sw-text-base); line-height: 1.48; }
+.sw-material-card__action { margin-top: auto; padding-top: var(--sw-space-5); }
+.sw-material-card__action a { font-weight: 900; text-transform: uppercase; }
+.sw-embed { position: relative; width: 100%; aspect-ratio: 16 / 9; border: 2px solid var(--sw-ink); background: var(--sw-gray-100); }
+.sw-embed iframe, .sw-embed video { display: block; width: 100%; height: 100%; border: 0; }
+.sw-lexicon { display: grid; gap: 0; border-top: 2px solid var(--sw-ink); }
+.sw-lexicon__item { display: grid; grid-template-columns: minmax(180px, 0.35fr) 1fr; gap: var(--sw-space-8); padding-block: var(--sw-space-6); border-bottom: 2px solid var(--sw-ink); }
+.sw-lexicon__term { font-weight: 900; font-size: var(--sw-text-lg); }
+
+/* ---------------------------------------------------------------------------
+   11. TEAM PAGE / PEOPLE
+   Observed team entries consist of image, name, responsibility, short bio and
+   contact link. Photographs should not be replaced with invented portraits.
+   --------------------------------------------------------------------------- */
+.sw-team-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: clamp(2rem, 4vw, 4.5rem) var(--sw-grid-gap); }
+.sw-person { display: flex; flex-direction: column; gap: var(--sw-space-4); min-width: 0; }
+.sw-person__photo { width: 100%; aspect-ratio: 4 / 4.65; object-fit: cover; object-position: center; background: var(--sw-teal-light); }
+.sw-person:nth-child(3n+2) .sw-person__photo { background-color: var(--sw-pink-light); }
+.sw-person:nth-child(3n+3) .sw-person__photo { background-color: var(--sw-yellow); }
+.sw-person__name { font: 900 var(--sw-text-h3)/1 var(--sw-font-display); letter-spacing: -0.05em; }
+.sw-person__role { font-weight: 900; font-size: var(--sw-text-lg); line-height: 1.2; }
+.sw-person__bio { line-height: 1.5; }
+.sw-person__contact { margin-top: auto; font-size: var(--sw-text-sm); font-weight: 900; }
+.sw-person--join .sw-person__photo { display: grid; place-items: center; background: var(--sw-pink); border: 2px solid var(--sw-ink); }
+.sw-person--join .sw-person__photo::after { content: "+ ?"; font: 900 clamp(5rem, 10vw, 10rem)/1 var(--sw-font-display); }
+
+/* ---------------------------------------------------------------------------
+   12. AWARDS / PARTNERS / LOGO WALL / SOCIAL PROOF
+   --------------------------------------------------------------------------- */
+.sw-logos { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: var(--sw-space-10) var(--sw-space-12); align-items: center; }
+.sw-logos a { display: grid; place-items: center; min-height: 5.5rem; }
+.sw-logos img { max-width: 100%; width: auto; max-height: 5.75rem; object-fit: contain; filter: grayscale(1); transition: filter var(--sw-normal), transform var(--sw-normal); }
+.sw-logos a:hover img { filter: none; transform: scale(1.035); }
+.sw-awards { border-top: 2px solid var(--sw-ink); border-bottom: 2px solid var(--sw-ink); }
+.sw-awards__item { display: flex; align-items: center; gap: var(--sw-space-6); padding-block: var(--sw-space-8); }
+.sw-awards__item + .sw-awards__item { border-top: 2px solid var(--sw-ink); }
+.sw-awards__year { font-size: var(--sw-text-h3); font-weight: 900; }
+.sw-awards__name { font-size: var(--sw-text-lg); font-weight: 800; }
+
+/* ---------------------------------------------------------------------------
+   13. FORMS: BOOKING, CONTACT, DOWNLOAD, NEWSLETTER
+   [OBSERVED] Booking form, materials form, newsletter checkbox, privacy
+   checkbox and a "SENDEN" button. Native validation styling is custom.
+   --------------------------------------------------------------------------- */
+.sw-form { display: grid; gap: var(--sw-space-6); }
+.sw-form__row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--sw-space-5); }
+.sw-field { display: grid; gap: 0.5rem; min-width: 0; }
+.sw-field__label { font-size: var(--sw-text-sm); font-weight: 900; text-transform: uppercase; }
+.sw-field__hint { font-size: var(--sw-text-xs); color: var(--sw-gray-700); }
+.sw-field__control, .sw-form :is(input:not([type="checkbox"],[type="radio"],[type="file"]), select, textarea) {
+  display: block; width: 100%; min-height: 3.25rem;
+  padding: 0.72rem 0.85rem;
+  border: var(--sw-stroke) solid var(--sw-ink); border-radius: 0;
+  outline: none; background: var(--sw-white); color: var(--sw-ink);
+  font-size: var(--sw-text-base); font-weight: 500; line-height: 1.3;
+  transition: background var(--sw-fast), border-color var(--sw-fast);
+}
+.sw-form textarea { min-height: 10rem; resize: vertical; }
+.sw-form :is(input,textarea)::placeholder { color: var(--sw-gray-500); opacity: 1; }
+.sw-form :is(input,select,textarea):focus-visible { outline: 3px solid var(--sw-pink); outline-offset: 2px; }
+.sw-form :is(input,select,textarea):user-invalid { border-color: var(--sw-error); }
+.sw-form :is(input,select,textarea):disabled { opacity: 0.5; background: var(--sw-gray-100); }
+.sw-form input[type="checkbox"], .sw-form input[type="radio"] {
+  flex: 0 0 auto; width: 1.2rem; height: 1.2rem; margin: 0.15rem 0 0;
+  accent-color: var(--sw-ink); cursor: pointer;
+}
+.sw-check { display: flex; align-items: flex-start; gap: 0.85rem; font-size: var(--sw-text-sm); line-height: 1.45; }
+.sw-form__status { display: block; min-height: 1rem; font-size: var(--sw-text-sm); font-weight: 700; }
+.sw-form__status--error { color: var(--sw-error); }
+.sw-form__status--success { color: var(--sw-success); }
+.sw-form__submit { justify-self: start; }
+.sw-form__fieldset { margin: 0; padding: 0; border: none; }
+.sw-form__legend { margin-bottom: var(--sw-space-4); font-weight: 900; font-size: var(--sw-text-lg); }
+
+/* ---------------------------------------------------------------------------
+   14. FOOTER / CONTACT / LEGAL / SECONDARY NAV
+   Site includes general offer positioning, funding/cooperation, legal links,
+   phone, newsletter and donation link.
+   --------------------------------------------------------------------------- */
+.sw-footer { background: var(--sw-black); color: var(--sw-white); padding-top: clamp(4rem, 7vw, 7.5rem); }
+.sw-footer__intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 0.48fr); gap: 5vw; }
+.sw-footer__statement { max-width: 26ch; font-size: clamp(1.5rem, 2.6vw, 3.2rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.25; }
+.sw-footer__contact { display: grid; align-content: start; gap: 1.4rem; }
+.sw-footer__contact a { width: fit-content; font-weight: 900; }
+.sw-footer__brand { margin-block: clamp(4rem, 7vw, 7rem); font: 900 clamp(3rem, 12.5vw, 12rem)/0.84 var(--sw-font-display); text-transform: uppercase; letter-spacing: -0.09em; overflow-wrap: anywhere; }
+.sw-footer__sponsors { padding-block: var(--sw-space-12); border-top: 2px solid currentColor; }
+.sw-footer__sponsors .sw-logos img { filter: grayscale(1) invert(1); }
+.sw-footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.2rem; padding-block: 1.65rem; border-top: 2px solid currentColor; }
+.sw-footer__links { display: flex; flex-wrap: wrap; gap: 0.7rem 2rem; list-style: none; padding: 0; }
+.sw-footer__links a { font-size: var(--sw-text-sm); font-weight: 800; text-decoration: none; text-transform: uppercase; }
+.sw-footer__links a:hover { color: var(--sw-teal); }
+.sw-footer__phone { font-size: var(--sw-text-sm); font-weight: 700; }
+.sw-footer--teal { background: var(--sw-teal); color: var(--sw-ink); }
+.sw-footer--pink { background: var(--sw-pink); color: var(--sw-ink); }
+
+/* ---------------------------------------------------------------------------
+   15. ARTICLE / POLICY / LEGAL PAGES / EMBEDS
+   --------------------------------------------------------------------------- */
+.sw-article { width: min(calc(100% - 2 * var(--sw-gutter)), var(--sw-reading-width)); margin-inline: auto; padding-block: var(--sw-section-block); }
+.sw-article__title { margin-bottom: var(--sw-space-8); font-size: var(--sw-text-h2); font-family: var(--sw-font-display); letter-spacing: -0.055em; line-height: 0.96; }
+.sw-article h2 { margin-top: 2.5em; font-size: var(--sw-text-h3); font-weight: 900; letter-spacing: -0.04em; }
+.sw-article h3 { margin-top: 1.75em; font-size: var(--sw-text-xl); font-weight: 900; }
+.sw-article p, .sw-article li { line-height: 1.67; }
+.sw-article p + p, .sw-article p + ul, .sw-article ul + p { margin-top: 1rem; }
+.sw-article img { width: auto; max-height: 660px; margin-block: var(--sw-space-8); }
+.sw-article table { border-collapse: collapse; width: 100%; margin-block: var(--sw-space-8); }
+.sw-article :is(th,td) { padding: 0.7rem; border: 1px solid var(--sw-ink); text-align: left; }
+.sw-article th { background: var(--sw-teal-light); }
+.sw-cookie-notice {
+  position: fixed; z-index: 300; left: 1rem; right: 1rem; bottom: 1rem;
+  display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
+  max-width: 960px; margin-inline: auto; padding: 1rem 1.2rem;
+  border: 2px solid var(--sw-ink); background: var(--sw-white);
+  box-shadow: var(--sw-shadow-hard); font-size: var(--sw-text-sm);
+}
+.sw-cookie-notice__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ---------------------------------------------------------------------------
+   16. INTERACTION / MICROANIMATION
+   Pixel arrow hover resembles observed Elementor pulse-grow class.
+   --------------------------------------------------------------------------- */
+@keyframes sw-pulse-grow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.115); }
+}
+@keyframes sw-pop-in {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sw-marquee { to { transform: translateX(-50%); } }
+.sw-pulse-on-hover:hover { animation: sw-pulse-grow 420ms ease-in-out 1; }
+.sw-entrance { animation: sw-pop-in 500ms var(--sw-ease-snap) both; }
+.sw-marquee { display: flex; gap: 3rem; width: max-content; white-space: nowrap; animation: sw-marquee 18s linear infinite; }
+.sw-marquee:hover { animation-play-state: paused; }
+.sw-image-hover { transition: transform var(--sw-slow) var(--sw-ease-snap); }
+.sw-image-hover:hover { transform: rotate(-1.5deg) scale(1.03); }
+
+/* ---------------------------------------------------------------------------
+   17. BREAKPOINTS / RESPONSIVE RULES
+   Inferred structural behavior, NOT extracted Elementor breakpoints.
+   --------------------------------------------------------------------------- */
+@media (min-width: 1600px) {
+  .sw-hero { min-height: 900px; }
+  .sw-offer { grid-template-columns: minmax(0, 1.25fr) minmax(370px, .75fr); }
+}
+@media (max-width: 1199.98px) {
+  .sw-grid--4 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .sw-logos { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .sw-offer { gap: 2.5rem; }
+  .sw-material-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 1023.98px) {
+  .sw-nav--desktop { display: none; }
+  .sw-section__head--split { grid-template-columns: 1fr; }
+  .sw-offer { grid-template-columns: minmax(0, 1fr) minmax(220px, .7fr); }
+  .sw-offer__title { font-size: clamp(2.3rem, 4.5vw, 4.3rem); }
+  .sw-program--cards, .sw-booking__layout { grid-template-columns: 1fr; }
+  .sw-booking__lead { position: static; }
+  .sw-team-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 767.98px) {
+  :root { --sw-gutter: clamp(1rem, 4.2vw, 1.5rem); --sw-section-block: clamp(3.5rem, 12vw, 5rem); }
+  .sw-header__inner { gap: .75rem; }
+  .sw-brand__tagline { display: none; }
+  .sw-hero { min-height: 88svh; padding-top: calc(var(--sw-header-height) + 2rem); }
+  .sw-hero__image, .sw-hero__gif { width: min(90vw, 550px); }
+  .sw-intro__statement { font-size: clamp(1.7rem, 5vw, 2.5rem); }
+  .sw-offer, .sw-offer:nth-child(even) { grid-template-columns: 1fr; }
+  .sw-offer { gap: 1rem; min-height: 0; padding-block: 3rem; }
+  .sw-offer__media, .sw-offer:nth-child(even) .sw-offer__media { order: -1; }
+  .sw-offer__media { min-height: 0; justify-items: start; }
+  .sw-offer__art { width: min(72%, 330px); margin: 0; }
+  .sw-offer__title { font-size: clamp(2.3rem, 9vw, 4rem); }
+  .sw-offer__duration { margin-top: 0; }
+  .sw-page-header__grid { grid-template-columns: 1fr; }
+  .sw-page-header__image { width: min(75%, 450px); margin-inline: auto; }
+  .sw-logos { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.8rem; }
+  .sw-grid--2, .sw-grid--3, .sw-grid--4 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .sw-lexicon__item { grid-template-columns: 1fr; gap: 0.5rem; }
+  .sw-footer__intro { grid-template-columns: 1fr; }
+  .sw-footer__brand { font-size: clamp(3rem, 13vw, 7rem); }
+  .sw-menu-panel { padding-top: calc(var(--sw-header-height) + 1.5rem); }
+  .sw-menu-panel__meta { flex-direction: column; }
+}
+@media (max-width: 559.98px) {
+  .sw-header__actions .sw-button { display: none; }
+  .sw-tabs { gap: 0; }
+  .sw-tabs__button, .sw-tab { font-size: 1rem; padding: .85rem .7rem; }
+  .sw-hero__corner { width: 3.5rem; }
+  .sw-offer__art { width: min(85%, 310px); }
+  .sw-material-grid, .sw-team-grid, .sw-grid--2, .sw-grid--3, .sw-grid--4 { grid-template-columns: 1fr; }
+  .sw-material-card__cover { min-height: 220px; }
+  .sw-form__row, .sw-program__step { grid-template-columns: 1fr; }
+  .sw-program__step { gap: .75rem; }
+  .sw-footer__bottom { flex-direction: column; }
+  .sw-footer__links { gap: .65rem 1rem; }
+  .sw-logos { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .sw-cookie-notice { flex-direction: column; align-items: start; }
+  .sw-menu-panel__links a { font-size: clamp(2.05rem, 8vw, 3.8rem); }
+}
+@media (max-width: 399.98px) {
+  .sw-brand__wordmark { font-size: 1rem; }
+  .sw-menu-toggle { font-size: 0.85rem; }
+  .sw-offer__title { overflow-wrap: anywhere; }
+  .sw-tabs__button { font-size: .9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sw-site *, .sw-site *::before, .sw-site *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+  }
+}
+@media (prefers-contrast: more) {
+  :root { --sw-color-border: #000000; --sw-ink: #000000; --sw-color-text-subtle: #111111; }
+  .sw-site .sw-field__control { border-width: 3px; }
+}
+@media print {
+  .sw-header, .sw-menu-panel, .sw-footer, .sw-cookie-notice, .sw-hero__scroll,
+  .sw-button, .sw-icon-button { display: none !important; }
+  .sw-site { overflow: visible; color: #000; background: #fff; }
+  .sw-section { padding: 1.5rem 0; break-inside: avoid; }
+  .sw-offer { break-inside: avoid; }
+  .sw-site a { color: #000; text-decoration: underline; }
+}
+
+/* ---------------------------------------------------------------------------
+   18. OPTIONAL ORIGINAL SITE ASSET URL REFERENCE [OBSERVED]
+
+   Hero animated character:
+   https://spreuweizen.de/wp-content/uploads/2025/03/25-03_zwinki.gif
+
+   Workshop illustration: PUSH BIS PRINT (width 914 x height 1024):
+   https://spreuweizen.de/wp-content/uploads/2025/02/Lua_PushbisPrint_web-914x1024.png
+   Full-size source advertised by WP srcset:
+   https://spreuweizen.de/wp-content/uploads/2025/02/Lua_PushbisPrint_web.png
+
+   Workshop illustration: INFLUENCING:
+   https://spreuweizen.de/wp-content/uploads/2025/02/Ina_Influencing_web-914x1024.png
+
+   Workshop illustration: FAKT ODER FAKE:
+   https://spreuweizen.de/wp-content/uploads/2025/02/Freddy_FaktoderFake_web-914x1024.png
+
+   Workshop illustration: MEINUNGSSTARK / Kinder:
+   https://spreuweizen.de/wp-content/uploads/2026/06/Kinder_Malik_Meinung-914x1024.png
+
+   Published brand favicon:
+   https://spreuweizen.de/wp-content/uploads/2020/07/fave-blk.png
+
+   Site-wide original components (identified in markup):
+   - Elementor nested accordions: .e-n-accordion and <details>
+   - Elementor UI icons: deliberately pixel-based inline SVGs
+   - Elementor booking links and category switchers
+   - Sections featuring award logos and sponsoring/cooperation logos
+   - Shared footer with newsletter, contact and legal navigation
+   - More artwork & team portraits exist, URLs not fully verified
+
+   NOTE: Remote image URLs may be changed by the source website. In production
+   download appropriately licensed copies to /public/assets/spreuweizen/, and
+   replace these CSS variables with local paths. A CSS file cannot supply
+   illustration assets, logos, content or menu/tab behavior by itself.
+   --------------------------------------------------------------------------- */

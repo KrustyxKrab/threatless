@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import StepperPlayer from '@/components/learn/StepperPlayer.astro';
+import { MODULES, type Module } from '@/data/modules';
+
+export function getStaticPaths() {
+  return MODULES.map((m, i) => ({
+    params: { id: m.id },
+    props: {
+      module: m,
+      nextModule: MODULES[(i + 1) % MODULES.length],
+    },
+  }));
+}
+
+interface Props {
+  module: Module;
+  nextModule: Module;
+}
+
+const { module, nextModule } = Astro.props;
+---
+
+<BaseLayout title={module.title} description={module.summary}>
+  <StepperPlayer module={module} nextModule={nextModule} />
+</BaseLayout>

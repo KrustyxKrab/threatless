@@ -1,0 +1,96 @@
+---
+import type { Module } from '@/data/modules';
+import { isArtKey } from '@/data/art';
+import Illo from '@/components/ui/Illo.astro';
+import LessonStep from './LessonStep.astro';
+import QuizStep from './QuizStep.astro';
+
+interface Props {
+  module: Module;
+  nextModule?: Module;
+}
+
+const { module, nextModule } = Astro.props;
+const totalSteps = module.lessons.length + module.quiz.length;
+const art = isArtKey(module.id) ? module.id : 'phishing';
+---
+
+<div
+  data-module-player={module.id}
+  data-tip-employee={module.roleTip.employee}
+  data-tip-volunteer={module.roleTip.volunteer}
+>
+  <div class="kq-learn-bar">
+    <div class="kq-learn-bar__row">
+      <a class="kq-btn kq-btn--ghost" href="/learn/">← All lessons</a>
+      <span class="kq-badge" data-stepper-count aria-live="polite">1 / {totalSteps}</span>
+    </div>
+    <div class="kq-progress" aria-hidden="true"><div class="kq-progress__bar" data-stepper-bar></div></div>
+  </div>
+
+  <div class="kq-learn-stage">
+    <div>
+      {module.lessons.map((lesson, idx) => <LessonStep lesson={lesson} index={idx} count={module.lessons.length} moduleTitle={module.title} />)}
+      {module.quiz.map((q, idx) => <QuizStep item={q} index={idx} count={module.quiz.length} />)}
+
+      <section data-step hidden class="kq-done">
+        <Illo name="done" width={260} class="kq-done__art" decorative />
+        <p class="kq-eyebrow">Lesson done · {module.title}</p>
+        <p class="kq-score" data-score tabindex="-1" data-step-title>0 / {module.quiz.length}</p>
+        <p class="kq-prose" data-result-summary>Your result is saved in this browser.</p>
+        <div class="kq-step-actions">
+          {
+            nextModule && (
+              <a class="kq-btn kq-btn--primary kq-btn--lg" href={`/learn/${nextModule.id}/`}>
+                Next lesson: {nextModule.title} <span aria-hidden="true">→</span>
+              </a>
+            )
+          }
+          <button type="button" class="kq-btn" data-restart>Practise again</button>
+          <a class="kq-btn kq-btn--ghost" href="/">Back to start</a>
+        </div>
+      </section>
+    </div>
+
+    <aside class="kq-learn-aside" aria-label="About this lesson">
+      <Illo name={art} width={320} class="kq-learn-aside__art" eager />
+      <div class="kq-callout kq-callout--teal">
+        <p class="kq-eyebrow">In your daily work</p>
+        <p style="margin-top:0.35rem" data-role-tip>{module.roleTip.volunteer}</p>
+      </div>
+      <div class="kq-callout">
+        <p class="kq-eyebrow">The one habit</p>
+        <p style="margin-top:0.35rem"><strong>Stop. Check. Report.</strong> Wait five seconds before you click. If unsure, ask someone you trust – by phone, not by replying.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  import { initStepper } from '@/lib/stepper';
+  import { update, watch } from '@/lib/storage';
+
+  const root = document.querySelector<HTMLElement>('[data-module-player]');
+  if (root) {
+    const id = root.dataset.modulePlayer!;
+    const tipEl = root.querySelector<HTMLElement>('[data-role-tip]');
+    const summaryEl = root.querySelector<HTMLElement>('[data-result-summary]');
+
+    watch((p) => {
+      if (tipEl) tipEl.textContent = (p.role === 'employee' ? root.dataset.tipEmployee : root.dataset.tipVolunteer) ?? '';
+    });
+
+    initStepper(root, ({ correct, total }) => {
+      update((p) => {
+        const prev = p.modules[id]?.best ?? 0;
+        p.modules[id] = { best: Math.max(prev, correct), total };
+      });
+      if (summaryEl) {
+        summaryEl.textContent =
+          correct === total
+            ? `All ${total} right. Great job – your result is saved in this browser.`
+            : `${correct} of ${total} right. Good start! Practise again or go on to the next lesson.`;
+      }
+    });
+  }
+</script>

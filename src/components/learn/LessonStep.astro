@@ -1,0 +1,48 @@
+---
+import type { Lesson } from '@/data/modules';
+
+interface Props {
+  lesson: Lesson;
+  index: number;
+  count: number;
+  moduleTitle: string;
+}
+const { lesson, index, count, moduleTitle } = Astro.props;
+const isLast = index === count - 1;
+
+/** "Pressure: The message wants…" → head + body */
+function splitPoint(pt: string): { head: string; body: string } {
+  const i = pt.indexOf(':');
+  return i !== -1 && i < 32 ? { head: pt.slice(0, i).trim(), body: pt.slice(i + 1).trim() } : { head: '', body: pt };
+}
+---
+
+<section data-step hidden={index !== 0}>
+  <p class="kq-eyebrow">{moduleTitle} · Read {index + 1} of {count}</p>
+  <h1 class="kq-h1" tabindex="-1" data-step-title style="margin-block:0.75rem 1.25rem">{lesson.title}</h1>
+  <p class="kq-lead">{lesson.text}</p>
+
+  {
+    lesson.points && (
+      <ol class="kq-warning-grid" style="list-style:none; padding:0">
+        {lesson.points.map((pt, i) => {
+          const { head, body } = splitPoint(pt);
+          return (
+            <li class="kq-warning-card">
+              <span class="kq-warning-card__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {head && <strong class="kq-h3">{head}</strong>}
+              <span class:list={[head && 'kq-muted']}>{body}</span>
+            </li>
+          );
+        })}
+      </ol>
+    )
+  }
+
+  <div class="kq-step-actions">
+    <button type="button" class="kq-btn kq-btn--primary kq-btn--lg" data-next>
+      {isLast ? 'Now practise' : 'Next'} <span aria-hidden="true">→</span>
+    </button>
+    {index > 0 && <button type="button" class="kq-btn kq-btn--ghost" data-prev>← Back</button>}
+  </div>
+</section>

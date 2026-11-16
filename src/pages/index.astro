@@ -1,0 +1,20 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProgressOverview from '@/components/home/ProgressOverview.astro';
+import HelpStrip from '@/components/home/HelpStrip.astro';
+import ModuleList from '@/components/learn/ModuleList.astro';
+import { MODULES } from '@/data/modules';
+---
+
+<BaseLayout>
+  <ProgressOverview />
+  <HelpStrip />
+
+  <section style="margin-top: var(--kq-section)" aria-labelledby="lessons-title">
+    <div class="kq-section-head">
+      <h2 id="lessons-title" class="kq-h2">{MODULES.length} short lessons</h2>
+      <p class="kq-muted" style="max-width:36ch">3–4 minutes each. Read a little, then practise with real-looking examples.</p>
+    </div>
+    <ModuleList />
+  </section>
+</BaseLayout>

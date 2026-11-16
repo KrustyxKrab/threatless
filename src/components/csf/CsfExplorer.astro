@@ -1,0 +1,78 @@
+---
+/** Wheel + detail text. Without JS every function's text is visible (progressive enhancement). */
+import { CSF } from '@/data/csf';
+import CsfWheel from './CsfWheel.astro';
+---
+
+<div class="kq-csf" data-csf>
+  <div style="display:grid; gap:1.25rem">
+    <CsfWheel />
+    <div class="kq-csf-list" role="group" aria-label="Choose a function">
+      {CSF.map((fn) => <button type="button" data-csf-seg={fn.id} aria-pressed="false" style={`--fn-color:${fn.color}`}>{fn.label}</button>)}
+    </div>
+  </div>
+
+  <div aria-live="polite">
+    {
+      CSF.map((fn, i) => (
+        <article id={fn.id} class="kq-csf-detail" data-csf-detail={fn.id} style={`--fn-color:${fn.color}; margin-bottom:2rem`}>
+          <p class="kq-eyebrow"><span class="kq-csf-detail__num">{String(i + 1).padStart(2, '0')}</span> {fn.label}</p>
+          <h2 class="kq-h2">{fn.question}</h2>
+          <p class="kq-prose">{fn.plain}</p>
+          <div class="kq-callout">
+            <p class="kq-eyebrow">Like in a house</p>
+            <p style="margin-top:0.25rem; font-weight:700">{fn.analogy}</p>
+            <p class="kq-muted" style="margin-top:0.25rem">Example: {fn.example}</p>
+          </div>
+          <ul class="kq-steps" style="margin:0">
+            {fn.actions.map((a) => <li><span>{a}</span></li>)}
+          </ul>
+          <div style="display:flex; flex-wrap:wrap; gap:0.5rem 1.25rem; align-items:center">
+            {fn.links.map((l, j) => (
+              <a class:list={['kq-btn', j === 0 ? 'kq-btn--primary' : 'kq-btn--ghost']} href={l.href}>
+                {l.label} <span aria-hidden="true">→</span>
+              </a>
+            ))}
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-csf]');
+  if (root) {
+    const triggers = [...root.querySelectorAll<SVGGElement | HTMLButtonElement>('[data-csf-seg]')];
+    const details = [...root.querySelectorAll<HTMLElement>('[data-csf-detail]')];
+    const wheel = root.querySelector('.kq-wheel');
+
+    const select = (id: string) => {
+      triggers.forEach((t) => {
+        const on = t.dataset.csfSeg === id;
+        t.setAttribute('aria-pressed', String(on));
+        t.classList.toggle('is-active', on);
+      });
+      details.forEach((d) => {
+        d.hidden = d.dataset.csfDetail !== id;
+        d.style.marginBottom = '0';
+      });
+      wheel?.classList.add('has-active');
+    };
+
+    root.addEventListener('click', (e) => {
+      const t = (e.target as Element).closest<HTMLElement>('[data-csf-seg]');
+      if (t) select(t.dataset.csfSeg!);
+    });
+    root.addEventListener('keydown', (e) => {
+      const t = (e.target as Element).closest<HTMLElement>('g[data-csf-seg]');
+      if (t && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        select(t.dataset.csfSeg!);
+      }
+    });
+
+    const fromHash = location.hash.slice(1);
+    select(details.some((d) => d.dataset.csfDetail === fromHash) ? fromHash : 'govern');
+  }
+</script>

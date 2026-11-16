@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import ModuleList from '@/components/learn/ModuleList.astro';
+---
+
+<BaseLayout title="Learn">
+  <SectionHead
+    kicker="Learn"
+    title="Five short lessons"
+    lead="Each lesson takes 3–4 minutes. You read a little, then decide if real-looking messages are safe or suspicious."
+    art="phishing"
+  />
+  <ModuleList />
+</BaseLayout>

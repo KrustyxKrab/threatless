@@ -1,0 +1,29 @@
+---
+import type { Module } from '@/data/modules';
+import { ART, isArtKey } from '@/data/art';
+import Illo from '@/components/ui/Illo.astro';
+
+interface Props {
+  module: Module;
+  index: number;
+}
+
+const { module, index } = Astro.props;
+const art = isArtKey(module.id) ? module.id : 'phishing';
+---
+
+<article class="kq-module-row" data-module={module.id} data-required={module.requiredFor.join(' ')}>
+  <span class="kq-module-row__num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+  <div class="kq-module-art" style={`--art-bg:${ART[art].bg}`}>
+    <Illo name={art} width={104} decorative />
+  </div>
+  <div class="kq-module-row__body">
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem">
+      <span class="kq-eyebrow">Lesson {index + 1} · {module.minutes} min</span>
+      <span class="kq-badge" data-chip>For your role</span>
+    </div>
+    <h3 class="kq-h3 kq-module-row__title"><a href={`/learn/${module.id}/`}>{module.title}</a></h3>
+    <p class="kq-muted" style="max-width:56ch">{module.summary}</p>
+  </div>
+  <span class="kq-module-row__cta" data-module-cta aria-hidden="true">Start →</span>
+</article>

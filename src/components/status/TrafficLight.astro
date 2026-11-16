@@ -1,0 +1,113 @@
+---
+import { LEVELS, OFFLINE_KIT } from '@/data/levels';
+---
+
+<div data-traffic-light>
+  <p class="kq-callout kq-callout--teal kq-noprint" style="margin-bottom:1.5rem; max-width:62ch">
+    <strong>Practice mode.</strong> The level you pick here is only saved in this browser. In real use, your coordinator
+    sets it for everyone.
+  </p>
+
+  <div class="kq-light-grid kq-noprint" role="group" aria-label="Choose alert level">
+    {
+      LEVELS.map((l) => (
+        <button type="button" class="kq-light-card" data-level={l.id} aria-pressed={l.id === 'green' ? 'true' : 'false'}>
+          <span class="kq-dot" aria-hidden="true" />
+          <span class="kq-light-card__label">{l.label} · {l.title}</span>
+          <span class="kq-light-card__desc">{l.description}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <!-- Active Level Action Protocol Panel -->
+  <section class="kq-panel kq-level-panel" data-level-panel data-level="green" style="margin-top: 1.5rem">
+    <p class="kq-eyebrow" data-panel-eyebrow>Right now: Green</p>
+
+    <h2 class="kq-h2" data-panel-title style="margin-top:0.5rem">All clear</h2>
+    <p class="kq-prose" data-panel-desc style="margin-top:0.35rem">
+      No known incident. Work as usual – and pause before you click.
+    </p>
+
+    <div style="margin-top:1.25rem">
+      <p style="font-weight:700; margin-bottom:0.75rem">What everyone does now:</p>
+      <ol class="kq-steps" data-panel-steps>
+        {LEVELS[0].steps.map((s) => <li><span>{s}</span></li>)}
+      </ol>
+    </div>
+
+    <div
+      class="kq-noprint"
+      style="display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem; margin-top:1.75rem"
+    >
+      <a class="kq-btn kq-btn--urgent" href="/report/">Something happened? Get help <span aria-hidden="true">→</span></a>
+      <button type="button" class="kq-btn" data-print-kit>Print the paper kit</button>
+    </div>
+  </section>
+
+  <!-- Printable Paper Fallback Kit -->
+  <section id="offline" style="margin-top: var(--kq-section)">
+    <div class="kq-section-head">
+      <h2 class="kq-h2">The paper kit</h2>
+      <p class="kq-muted" style="max-width:44ch">
+        For Red: when accounts or laptops don’t work. Print it once and keep it with your workshop things.
+      </p>
+    </div>
+
+    <div class="kq-grid kq-grid--3">
+      {
+        OFFLINE_KIT.map((box) => (
+          <div style="border-top:var(--kq-border-std); padding-top:1rem">
+            <h3 class="kq-h3" style="margin-bottom:0.75rem">{box.title}</h3>
+            <ul class="kq-steps">
+              {box.items.map((item) => (
+                <li><span>{item}</span></li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</div>
+
+<script>
+  import { levelById, type Level } from '@/data/levels';
+  import { update, watch } from '@/lib/storage';
+
+  const root = document.querySelector<HTMLElement>('[data-traffic-light]');
+  if (root) {
+    const cards = root.querySelectorAll<HTMLButtonElement>('.kq-light-card');
+    const panel = root.querySelector<HTMLElement>('[data-level-panel]')!;
+    const eyebrow = root.querySelector<HTMLElement>('[data-panel-eyebrow]')!;
+    const title = root.querySelector<HTMLElement>('[data-panel-title]')!;
+    const desc = root.querySelector<HTMLElement>('[data-panel-desc]')!;
+    const stepsEl = root.querySelector<HTMLElement>('[data-panel-steps]')!;
+
+    cards.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        update((p) => {
+          p.level = btn.dataset.level as Level;
+        });
+      });
+    });
+
+    root.querySelector<HTMLButtonElement>('[data-print-kit]')?.addEventListener('click', () => window.print());
+
+    watch((p) => {
+      const info = levelById(p.level);
+      cards.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === p.level)));
+      panel.dataset.level = p.level;
+      eyebrow.textContent = `Right now: ${info.label}`;
+      title.textContent = info.title;
+      desc.textContent = info.description;
+      stepsEl.replaceChildren(
+        ...info.steps.map((s) => {
+          const li = document.createElement('li');
+          li.textContent = s;
+          return li;
+        })
+      );
+    });
+  }
+</script>

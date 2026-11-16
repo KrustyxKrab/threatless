@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import SelfCheck from '@/components/check/SelfCheck.astro';
+---
+
+<BaseLayout title="Organisation Self-Check">
+  <div style="margin-bottom: 1rem">
+    <a class="kq-btn kq-btn--ghost" href="/framework/">← Back to Security Framework</a>
+  </div>
+  <SectionHead
+    kicker="Diagnostic Gap Assessment · 10 Questions"
+    title="Organisation Self-Check"
+    lead="Review your current setup and training readiness. Your answers are saved locally in this browser and highlight which building block needs attention first."
+  />
+  <SelfCheck />
+</BaseLayout>

@@ -1,0 +1,90 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import CsfExplorer from '@/components/csf/CsfExplorer.astro';
+import { CSF_QUIZ } from '@/data/csf';
+---
+
+<BaseLayout title="Security Framework">
+  <SectionHead
+    kicker="Framework · NIST CSF 2.0"
+    title="How security fits together"
+    lead="Security is not one tool. It is six simple questions. This free model from the US standards institute NIST works for small teams too. Tap a part of the circle."
+    art="framework"
+  />
+
+  <CsfExplorer />
+
+  <!-- Quick 5-Question Check -->
+  <section style="margin-top: var(--kq-section)">
+    <div class="kq-section-head">
+      <h2 class="kq-h2">Quick check: which part is it?</h2>
+      <a class="kq-btn kq-btn--ghost" href="/framework/check/">For coordinators: 10-question team check →</a>
+    </div>
+
+    <div data-csf-quiz style="max-width:740px">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:var(--kq-border-std)">
+        <span class="kq-eyebrow">5 situations</span>
+        <div style="display:flex; align-items:center; gap:0.75rem; flex:1; max-width:260px">
+          <div class="kq-progress" style="flex:1">
+            <div class="kq-progress__bar" data-stepper-bar></div>
+          </div>
+          <span class="kq-badge" data-stepper-count>1 / {CSF_QUIZ.length}</span>
+        </div>
+      </div>
+
+      {
+        CSF_QUIZ.map((q, i) => (
+          <div data-step data-quiz hidden={i !== 0}>
+            <h3 class="kq-h2" tabindex="-1" data-step-title style="margin-bottom:1rem; font-size:clamp(1.3rem,1rem + 1vw,1.8rem)">
+              {q.prompt}
+            </h3>
+            <div class="kq-options kq-options--2">
+              {q.options.map((opt, oIdx) => (
+                <button type="button" class="kq-option" data-option data-correct={oIdx === q.answer ? '' : undefined}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+            <div class="kq-feedback" data-feedback hidden>
+              <p data-feedback-heading style="font-weight:900; margin-bottom:0.25rem"></p>
+              <p style="font-size:0.94rem">{q.explain}</p>
+              <div style="margin-top:0.85rem">
+                <button type="button" class="kq-btn kq-btn--primary" data-next>
+                  <span>Next →</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+
+      <div data-step hidden>
+        <p class="kq-eyebrow" style="color:var(--kq-green-fg)">Completed</p>
+        <p class="kq-score" style="margin-block:0.35rem" data-score>
+          0 / {CSF_QUIZ.length}
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:0.65rem; margin-top:1rem">
+          <button type="button" class="kq-btn" data-restart>Try again</button>
+          <a class="kq-btn kq-btn--primary" href="/framework/check/">
+            <span>Run 10-question self-check →</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initStepper } from '@/lib/stepper';
+  import { update } from '@/lib/storage';
+
+  const quiz = document.querySelector<HTMLElement>('[data-csf-quiz]');
+  if (quiz) {
+    initStepper(quiz, ({ correct }) => {
+      update((p) => {
+        p.frameworkQuiz = Math.max(p.frameworkQuiz ?? 0, correct);
+      });
+    });
+  }
+</script>

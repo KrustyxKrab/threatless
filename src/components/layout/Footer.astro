@@ -1,0 +1,18 @@
+---
+import { SITE } from '@/data/site';
+---
+
+<footer class="kq-footer">
+  <div class="sw-container kq-footer__inner">
+    <span><strong>{SITE.org} × {SITE.name}</strong> · Prototype. Your progress stays in this browser only.</span>
+    <button type="button" class="kq-footer__reset" data-reset-progress>Delete my progress</button>
+  </div>
+</footer>
+
+<script>
+  import { reset } from '@/lib/storage';
+
+  document.querySelector<HTMLButtonElement>('[data-reset-progress]')?.addEventListener('click', () => {
+    if (confirm('Delete your training progress and demo status from this browser? This cannot be undone.')) reset();
+  });
+</script>

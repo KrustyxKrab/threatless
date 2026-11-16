@@ -1,0 +1,13 @@
+---
+import { ICONS, type IconName } from './icons';
+
+interface Props {
+  name: IconName;
+  class?: string;
+}
+const { name, class: className } = Astro.props;
+---
+
+<svg class:list={['kq-icon', className]} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path d={ICONS[name]} fill="currentColor" fill-rule="evenodd"></path>
+</svg>

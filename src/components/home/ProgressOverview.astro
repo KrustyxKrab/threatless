@@ -1,0 +1,93 @@
+---
+import { MODULES } from '@/data/modules';
+import { ROLES } from '@/data/game';
+import Illo from '@/components/ui/Illo.astro';
+
+const totalMinutes = MODULES.reduce((sum, m) => sum + m.minutes, 0);
+const first = MODULES[0];
+---
+
+<section
+  class="kq-hero"
+  data-progress-overview
+  data-module-ids={MODULES.map((m) => m.id).join(',')}
+  data-module-titles={MODULES.map((m) => m.title).join('|')}
+  data-module-mins={MODULES.map((m) => m.minutes).join(',')}
+>
+  <div class="kq-hero__copy">
+    <p class="kq-eyebrow">SPREUWEIZEN × Krise-Quartett</p>
+    <h1 class="kq-display">Stay calm when digital chaos hits.</h1>
+    <p class="kq-lead">
+      No IT knowledge needed. Short games show you how fake e-mails look, how to protect people’s data and what to do
+      if something goes wrong.
+    </p>
+
+    <div class="kq-only-mobile" style="display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem">
+      <span style="font-weight:700; font-size:0.95rem">I am</span>
+      <div class="kq-role-switch" role="group" aria-label="Select your role">
+        {
+          ROLES.map((r) => (
+            <button type="button" data-header-role={r.id} aria-pressed="false">
+              {r.label === 'Employee' ? 'staff' : r.label.toLowerCase()}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="kq-continue">
+      <div class="kq-continue__meta">
+        <span data-progress-summary>0 of {MODULES.length} lessons done</span>
+        <span class="kq-muted" data-progress-time>about {totalMinutes} min in total</span>
+      </div>
+      <div class="kq-progress" role="progressbar" aria-label="Lessons done" aria-valuemin="0" aria-valuemax={MODULES.length} aria-valuenow="0" data-modules-progress>
+        <div class="kq-progress__bar" data-modules-bar></div>
+      </div>
+      <a class="kq-btn kq-btn--primary kq-btn--lg" href={`/learn/${first.id}/`} data-next-link>
+        <span data-next-label>Start lesson 1: {first.title}</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="kq-hero__art">
+    <Illo name="hero" width={560} eager />
+  </div>
+</section>
+
+<script>
+  import { watch } from '@/lib/storage';
+
+  const root = document.querySelector<HTMLElement>('[data-progress-overview]');
+  if (root) {
+    const ids = (root.dataset.moduleIds ?? '').split(',').filter(Boolean);
+    const titles = (root.dataset.moduleTitles ?? '').split('|');
+    const mins = (root.dataset.moduleMins ?? '').split(',').map(Number);
+    const summaryEl = root.querySelector<HTMLElement>('[data-progress-summary]')!;
+    const timeEl = root.querySelector<HTMLElement>('[data-progress-time]')!;
+    const bar = root.querySelector<HTMLElement>('[data-modules-bar]')!;
+    const track = root.querySelector<HTMLElement>('[data-modules-progress]')!;
+    const nextLink = root.querySelector<HTMLAnchorElement>('[data-next-link]')!;
+    const nextLabel = root.querySelector<HTMLElement>('[data-next-label]')!;
+
+    watch((p) => {
+      const doneCount = ids.filter((id) => p.modules[id]).length;
+      const remaining = ids.reduce((sum, id, i) => (p.modules[id] ? sum : sum + (mins[i] || 3)), 0);
+      const allDone = doneCount === ids.length;
+
+      summaryEl.textContent = allDone ? 'All lessons done – well done!' : `${doneCount} of ${ids.length} lessons done`;
+      timeEl.textContent = allDone ? '' : `about ${remaining} min left`;
+      bar.style.setProperty('--value', `${Math.round((doneCount / ids.length) * 100)}%`);
+      track.setAttribute('aria-valuenow', String(doneCount));
+
+      const nextIdx = ids.findIndex((id) => !p.modules[id]);
+      if (nextIdx === -1) {
+        nextLink.href = '/learn/';
+        nextLabel.textContent = 'Practise again';
+      } else {
+        nextLink.href = `/learn/${ids[nextIdx]}/`;
+        nextLabel.textContent = `${doneCount === 0 ? 'Start' : 'Continue with'} lesson ${nextIdx + 1}: ${titles[nextIdx]}`;
+      }
+    });
+  }
+</script>

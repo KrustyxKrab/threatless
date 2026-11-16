@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#ea3365"/>
+  <rect x="5" y="5" width="54" height="54" rx="11" fill="#080808"/>
+  <!-- Left & Right SPREUWEIZEN Zwinki Eyes -->
+  <path d="M11 18h16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M11 32c3-7 13-7 16 0-3 7-13 7-16 0z" fill="#ffffff"/>
+  <circle cx="19" cy="32" r="3.5" fill="#080808"/>
+  <path d="M36 21l17-3" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M37 31c3-7 13-7 16 0-3 7-13 7-16 0z" fill="#ffffff"/>
+  <circle cx="45" cy="31" r="3.5" fill="#080808"/>
+  <!-- Traffic Light Dots at Bottom -->
+  <circle cx="21" cy="49" r="4" fill="#3ccf7a"/>
+  <circle cx="32" cy="49" r="4" fill="#f6d860"/>
+  <circle cx="43" cy="49" r="4" fill="#ff4b4b"/>
+</svg>

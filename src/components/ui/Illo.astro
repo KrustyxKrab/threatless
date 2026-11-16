@@ -1,0 +1,27 @@
+---
+import { Image } from 'astro:assets';
+import { ART, type ArtKey } from '@/data/art';
+
+interface Props {
+  name: ArtKey;
+  /** rendered CSS width in px (largest); drives the generated sizes */
+  width?: number;
+  class?: string;
+  eager?: boolean;
+  /** decorative: hide from screen readers */
+  decorative?: boolean;
+}
+const { name, width = 320, class: className, eager = false, decorative = false } = Astro.props;
+const art = ART[name];
+---
+
+<Image
+  class:list={['kq-illo', className]}
+  src={art.src}
+  alt={decorative ? '' : art.alt}
+  width={width}
+  widths={[width, width * 2]}
+  sizes={`${width}px`}
+  format="webp"
+  loading={eager ? 'eager' : 'lazy'}
+/>

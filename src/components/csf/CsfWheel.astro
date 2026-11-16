@@ -1,0 +1,65 @@
+---
+/**
+ * NIST CSF 2.0 wheel: Govern as the inner ring, the five other functions around it.
+ * Each segment is a button; selection is handled by the parent [data-csf] script.
+ */
+import { CSF } from '@/data/csf';
+import { polar, ringSegment, textArc } from '@/lib/arc';
+
+const C = 220; // centre
+const R_OUT = 205;
+const R_MID = 140;
+const R_IN = 92;
+const POP = 8; // how far the active segment moves out
+
+/** full donut via two circles + even-odd fill (no seams) */
+const circle = (r: number) => `M${C - r} ${C}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
+const ring = (rOut: number, rIn: number) => circle(rOut) + circle(rIn);
+
+const outer = CSF.filter((f) => f.id !== 'govern');
+const govern = CSF.find((f) => f.id === 'govern')!;
+const step = 360 / outer.length;
+
+const segments = outer.map((fn, i) => {
+  const a0 = i * step;
+  const a1 = a0 + step;
+  const shift = polar(0, 0, POP, (a0 + a1) / 2);
+  return {
+    fn,
+    d: ringSegment(C, C, R_MID, R_OUT, a0, a1),
+    text: textArc(C, C, (R_MID + R_OUT) / 2, a0 + 4, a1 - 4),
+    dx: `${shift.x}px`,
+    dy: `${shift.y}px`,
+  };
+});
+---
+
+<svg class="kq-wheel" viewBox="0 0 440 440" role="group" aria-label="NIST Cybersecurity Framework: six functions. Choose one to read about it.">
+  <defs>
+    {segments.map((s) => <path id={`csf-arc-${s.fn.id}`} d={s.text} />)}
+    <path id="csf-arc-govern" d={textArc(C, C, (R_IN + R_MID) / 2, 300, 420)} />
+  </defs>
+
+  {
+    segments.map((s) => (
+      <g class="kq-wheel__seg" data-csf-seg={s.fn.id} role="button" tabindex="0" aria-pressed="false" aria-label={s.fn.label} style={`--dx:${s.dx}; --dy:${s.dy}`}>
+        <path class="kq-wheel__shape" d={s.d} fill={s.fn.color} />
+        <text class="kq-wheel__label" dominant-baseline="middle">
+          <textPath href={`#csf-arc-${s.fn.id}`} startOffset="50%" text-anchor="middle">{s.fn.label.toUpperCase()}</textPath>
+        </text>
+      </g>
+    ))
+  }
+
+  <g class="kq-wheel__seg" data-csf-seg="govern" role="button" tabindex="0" aria-pressed="false" aria-label={govern.label}>
+    <path class="kq-wheel__shape" d={ring(R_MID, R_IN)} fill={govern.color} fill-rule="evenodd" />
+    <text class="kq-wheel__label" dominant-baseline="middle" style="font-size:20px">
+      <textPath href="#csf-arc-govern" startOffset="50%" text-anchor="middle">GOVERN</textPath>
+    </text>
+  </g>
+
+  <circle cx={C} cy={C} r={R_IN} fill="var(--kq-bg)" />
+  <text class="kq-wheel__center" x={C} y={C - 20} text-anchor="middle">NIST</text>
+  <text class="kq-wheel__center" x={C} y={C + 2} text-anchor="middle">Cybersecurity</text>
+  <text class="kq-wheel__center" x={C} y={C + 24} text-anchor="middle">Framework</text>
+</svg>

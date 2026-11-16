@@ -1,0 +1,28 @@
+---
+---
+
+<a
+  class="kq-level-chip"
+  href="/status/"
+  data-level-chip
+  data-level="green"
+  aria-label="Current alert status: Green (All clear). Click to view or change status."
+>
+  <span class="kq-dot" aria-hidden="true"></span>
+  <span><span class="kq-hide-sm">Status: </span><span data-level-label>Green</span></span>
+</a>
+
+<script>
+  import { levelById } from '@/data/levels';
+  import { watch } from '@/lib/storage';
+
+  document.querySelectorAll<HTMLElement>('[data-level-chip]').forEach((chip) => {
+    const label = chip.querySelector<HTMLElement>('[data-level-label]');
+    watch((p) => {
+      const info = levelById(p.level);
+      chip.dataset.level = p.level;
+      if (label) label.textContent = info.label;
+      chip.setAttribute('aria-label', `Current alert status: ${info.label} (${info.title}). Click to view or change status.`);
+    });
+  });
+</script>

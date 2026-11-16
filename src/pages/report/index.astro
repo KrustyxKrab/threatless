@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import IncidentReporter from '@/components/report/IncidentReporter.astro';
+---
+
+<BaseLayout title="Get help">
+  <SectionHead
+    kicker="Get help"
+    title="Something happened?"
+    lead="Stay calm. It happens to everyone and nobody gets blamed. Telling someone fast matters more than doing it perfectly."
+    art="report"
+  />
+  <IncidentReporter />
+</BaseLayout>

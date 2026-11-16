@@ -1,0 +1,21 @@
+---
+import Illo from './Illo.astro';
+import type { ArtKey } from '@/data/art';
+
+interface Props {
+  kicker?: string;
+  title: string;
+  lead?: string;
+  art?: ArtKey;
+}
+const { kicker, title, lead, art } = Astro.props;
+---
+
+<header class="kq-page-head">
+  <div style="display:grid; gap:0.75rem">
+    {kicker && <p class="kq-eyebrow">{kicker}</p>}
+    <h1 class="kq-h1">{title}</h1>
+    {lead && <p class="kq-lead">{lead}</p>}
+  </div>
+  {art && <Illo name={art} width={260} class="kq-page-head__art" eager decorative />}
+</header>

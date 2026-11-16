@@ -1,0 +1,35 @@
+---
+import type { Channel, Message } from '@/data/modules';
+
+interface Props {
+  message: Message;
+  signs?: string[];
+}
+const { message, signs } = Astro.props;
+
+const CHANNEL: Record<Channel, string> = {
+  email: 'E-mail',
+  sms: 'Text message',
+  call: 'Phone call',
+  social: 'Social media comment',
+  chat: 'Chat message',
+};
+---
+
+<figure class="kq-mail-client" style="margin:0" aria-label={`Example ${CHANNEL[message.channel].toLowerCase()}`}>
+  <div class="kq-mail-client__chrome">{CHANNEL[message.channel]}</div>
+  <dl class="kq-mail-client__meta" style="margin:0">
+    <dt>From</dt>
+    <dd>{message.from}</dd>
+    {message.subject && (<><dt>Subject</dt><dd>{message.subject}</dd></>)}
+  </dl>
+  <div class="kq-mail-client__body">{message.body}</div>
+  {
+    signs && (
+      <details class="kq-mail-client__hint">
+        <summary>Need a hint?</summary>
+        <p style="margin-top:0.4rem">Look closely at the sender, the tone and what they want you to do.</p>
+      </details>
+    )
+  }
+</figure>

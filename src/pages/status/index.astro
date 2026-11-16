@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import TrafficLight from '@/components/status/TrafficLight.astro';
+---
+
+<BaseLayout title="Alert level & paper kit">
+  <SectionHead
+    kicker="Alert level"
+    title="Green, Yellow, Red"
+    lead="Like a traffic light: it tells everyone how careful to be today and what to do."
+    art="status"
+  />
+  <TrafficLight />
+</BaseLayout>
