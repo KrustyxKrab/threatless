@@ -6,7 +6,7 @@ import type { Role } from './game';
  * secure sharing, access rights, awareness). Phishing comes first because e-mail
  * phishing is the most common way attacks start (ENISA Threat Landscape, BSI report).
  */
-export type Channel = 'email' | 'sms' | 'call' | 'social' | 'chat';
+export type Channel = 'email' | 'sms' | 'call' | 'social' | 'chat' | 'story';
 
 export interface Message {
   channel: Channel;
@@ -344,6 +344,18 @@ export const MODULES: readonly Module[] = [
       volunteer: 'Unsure? Use the Report button. It guides you step by step.',
     },
     quiz: [
+      {
+        prompt: 'Safe or suspicious?',
+        message: {
+          channel: 'story',
+          from: 'spreuweizen_offical',
+          body: 'We turn 10! 🎉 Swipe up, log in with your bank details and get a €50 thank-you voucher. Only 2 hours left!',
+        },
+        options: SPOT,
+        answer: 1,
+        explain: 'Scams also come as stories and ads. No real organisation asks for your bank login to send a gift.',
+        signs: ['Misspelled account name (“offical”)', 'Asks for your bank login', 'Time pressure: “only 2 hours”'],
+      },
       {
         prompt: 'What is the best response?',
         message: {

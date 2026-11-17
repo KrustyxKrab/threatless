@@ -1,5 +1,6 @@
 ---
 import { INCIDENTS } from '@/data/incidents';
+import Illo from '@/components/ui/Illo.astro';
 
 const URGENCY = { red: 'Urgent', yellow: 'Be careful', green: 'Low' } as const;
 const first = INCIDENTS[0];
@@ -43,9 +44,7 @@ const first = INCIDENTS[0];
         <span class="kq-journey-step__num" aria-hidden="true">3</span>
         <h2 id="step3" class="kq-h3">Tell your coordinator</h2>
       </div>
-      <p class="kq-muted">
-        This prototype does not send anything. Copy the short report and paste it into your team chat or an e-mail.
-      </p>
+      <p class="kq-muted">Copy the short report and send it to your coordinator in your team chat or by e-mail.</p>
       <form data-report-form style="display:grid; gap:0.85rem">
         <label style="display:grid; gap:0.35rem">
           <span style="font-weight:700">What happened, and when? <span class="kq-muted" style="font-weight:400">(optional)</span></span>
@@ -58,10 +57,25 @@ const first = INCIDENTS[0];
         </label>
         <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem 1.25rem">
           <button type="button" class="kq-btn kq-btn--primary kq-btn--lg" data-copy-report>Copy report</button>
-          <button type="submit" class="kq-btn kq-btn--ghost">Also keep a note in this browser</button>
+          <button type="submit" class="kq-btn kq-btn--ghost">Save a copy for me</button>
         </div>
         <p class="kq-callout kq-callout--teal" data-report-feedback hidden role="status"></p>
       </form>
+    </section>
+
+    <section class="kq-report-done" data-report-done hidden aria-labelledby="done-title" tabindex="-1">
+      <Illo name="done" width={140} class="kq-report-done__art" decorative />
+      <h2 id="done-title" class="kq-h2">Done. You did the right thing.</h2>
+      <p>Reporting fast is the most important step – and you did it.</p>
+      <ol class="kq-steps" style="margin:0">
+        <li><span>Send the copied report to your coordinator now (team chat or e-mail).</span></li>
+        <li><span>They check it and may change the team alert level – you’ll see it at the top of the app.</span></li>
+        <li><span>Until then: don’t click, don’t reply, keep an eye out for similar messages.</span></li>
+      </ol>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem 1.25rem; align-items:center">
+        <a class="kq-btn kq-btn--primary kq-btn--lg" href="/">Back to start <span aria-hidden="true">→</span></a>
+        <a class="kq-btn kq-btn--ghost" href="/status/">See the alert level</a>
+      </div>
     </section>
   </div>
 </div>
@@ -84,9 +98,15 @@ const first = INCIDENTS[0];
     const note = form.elements.namedItem('note') as HTMLTextAreaElement;
     const feedback = root.querySelector<HTMLElement>('[data-report-feedback]')!;
 
+    const doneEl = root.querySelector<HTMLElement>('[data-report-done]')!;
     const say = (msg: string) => {
       feedback.textContent = msg;
       feedback.hidden = false;
+    };
+    const finish = () => {
+      doneEl.hidden = false;
+      doneEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      doneEl.focus({ preventScroll: true });
     };
 
     function updateCounter() {
@@ -132,6 +152,7 @@ const first = INCIDENTS[0];
         active = found;
         checked = new Set<number>();
         feedback.hidden = true;
+        doneEl.hidden = true;
         renderActive();
         if (window.innerWidth < 1024) root.querySelector('[data-incident-detail]')?.scrollIntoView({ behavior: 'smooth' });
       });
@@ -147,8 +168,10 @@ const first = INCIDENTS[0];
       try {
         await navigator.clipboard.writeText(text);
         say('✓ Copied. Paste it into your team chat or an e-mail to your coordinator.');
+        finish();
       } catch {
         say(`Copying didn’t work here. Please copy this text by hand:\n\n${text}`);
+        finish();
       }
     });
 
@@ -163,7 +186,8 @@ const first = INCIDENTS[0];
           note: note.value.trim(),
         });
       });
-      say('✓ Saved in this browser only. Nobody else can see it – please still tell your coordinator.');
+      say('✓ Saved on this device. Please still send it to your coordinator.');
+      finish();
     });
 
     renderActive();

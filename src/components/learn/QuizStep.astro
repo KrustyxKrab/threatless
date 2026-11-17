@@ -14,7 +14,7 @@ const { item: q, index, count } = Astro.props;
   <p class="kq-eyebrow">Practice {index + 1} of {count}</p>
   <h1 class="kq-h2" tabindex="-1" data-step-title style="margin-block:0.75rem 1.25rem">{q.prompt}</h1>
 
-  {q.message && <MessageMock message={q.message} signs={q.signs} />}
+  {q.message && <MessageMock message={q.message} />}
 
   <p style="font-weight:700; margin-top:1.5rem">What do you think?</p>
   <div class:list={['kq-options', q.options.length === 2 && 'kq-options--2']}>
@@ -29,7 +29,7 @@ const { item: q, index, count } = Astro.props;
 
   <div class="kq-feedback" data-feedback hidden role="status">
     <p data-feedback-heading style="font-weight:800; font-size:1.1rem; margin-bottom:0.35rem"></p>
-    <p>{q.explain}</p>
+    <p data-explain>{q.explain}</p>
     {
       q.signs && (
         <ul style="margin:0.75rem 0 0; padding-left:1.2rem">

@@ -1,0 +1,31 @@
+---
+/** Help mode: always available, separate from learning. */
+import Illo from '@/components/ui/Illo.astro';
+---
+
+<section class="kq-mode kq-mode--help" aria-labelledby="help-title">
+  <Illo name="report" width={110} class="kq-mode__art" decorative />
+  <span class="kq-mode__tag">Help</span>
+  <h2 id="help-title" class="kq-h2">Something happened?</h2>
+  <p style="opacity:0.85">
+    A message looks odd, you clicked a link, typed your password somewhere or lost a phone. You get clear steps. Nobody gets blamed.
+  </p>
+  <a class="kq-btn kq-btn--urgent kq-btn--lg" href="/report/">Get help now <span aria-hidden="true">→</span></a>
+  <a class="kq-mode__alert" href="/status/" data-help-level data-level="green">
+    <span class="kq-dot" aria-hidden="true"></span>
+    <span>Team alert level: <span data-help-level-label>Green</span></span>
+  </a>
+</section>
+
+<script>
+  import { levelById } from '@/data/levels';
+  import { watch } from '@/lib/storage';
+
+  const el = document.querySelector<HTMLElement>('[data-help-level]');
+  if (el) {
+    watch((p) => {
+      el.dataset.level = p.level;
+      el.querySelector('[data-help-level-label]')!.textContent = `${levelById(p.level).label} – ${levelById(p.level).title}`;
+    });
+  }
+</script>

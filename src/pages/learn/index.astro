@@ -1,15 +1,14 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import SectionHead from '@/components/ui/SectionHead.astro';
-import ModuleList from '@/components/learn/ModuleList.astro';
+import PointsCard from '@/components/learn/PointsCard.astro';
+import LearnPath from '@/components/learn/LearnPath.astro';
 ---
 
 <BaseLayout title="Learn">
-  <SectionHead
-    kicker="Learn"
-    title="Five short lessons"
-    lead="Each lesson takes 3–4 minutes. You read a little, then decide if real-looking messages are safe or suspicious."
-    art="phishing"
-  />
-  <ModuleList />
+  <div style="display:grid; gap:1rem; max-width:560px; margin-inline:auto">
+    <h1 class="kq-h1">Your path</h1>
+    <p class="kq-muted">Each step: read a little, then decide if real-looking messages are safe. Every right answer gives 10 points.</p>
+    <PointsCard />
+  </div>
+  <LearnPath />
 </BaseLayout>

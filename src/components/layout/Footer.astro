@@ -1,11 +1,13 @@
 ---
 import { SITE } from '@/data/site';
+import RoleSwitch from './RoleSwitch.astro';
 ---
 
 <footer class="kq-footer">
   <div class="sw-container kq-footer__inner">
-    <span><strong>{SITE.org} × {SITE.name}</strong> · Prototype. Your progress stays in this browser only.</span>
-    <button type="button" class="kq-footer__reset" data-reset-progress>Delete my progress</button>
+    <span><strong>{SITE.name}</strong> by {SITE.org}</span>
+    <RoleSwitch />
+    <button type="button" class="kq-footer__reset" data-reset-progress>Reset my progress</button>
   </div>
 </footer>
 
@@ -13,6 +15,6 @@ import { SITE } from '@/data/site';
   import { reset } from '@/lib/storage';
 
   document.querySelector<HTMLButtonElement>('[data-reset-progress]')?.addEventListener('click', () => {
-    if (confirm('Delete your training progress and demo status from this browser? This cannot be undone.')) reset();
+    if (confirm('Reset your points and progress on this device?')) reset();
   });
 </script>

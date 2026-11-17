@@ -2,11 +2,11 @@ import type { IconName } from '@/components/ui/icons';
 
 /** Global app metadata and navigation. Single source of truth for SEO + menus. */
 export const SITE = {
-  name: 'Krise-Quartett',
+  name: 'Threatless',
   org: 'SPREUWEIZEN',
-  tagline: 'Cybersecurity learning & emergency response',
+  tagline: 'Spot scams. Get help fast.',
   description:
-    'Krise-Quartett: short, gamified cybersecurity training for nonprofit teams – with a traffic-light alert system and one-click incident reporting.',
+    'Threatless: learn to spot scams in short games – and get calm, step-by-step help when something goes wrong.',
   ogImage: '/og-image.jpg',
   /** Recipient for incident reports. Leave empty to let the user choose in their mail app. */
   reportEmail: '',

@@ -1,0 +1,30 @@
+---
+/** Small, out-of-the-way role setting. Changes which lessons are marked "for you" and the daily tips. */
+import { ROLES } from '@/data/game';
+---
+
+<div class="kq-role" role="group" aria-label="I am">
+  <span>I am</span>
+  {
+    ROLES.map((r) => (
+      <button type="button" data-role={r.id} aria-pressed="false" title={r.hint}>
+        {r.id === 'employee' ? 'Staff' : 'Volunteer'}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  import type { Role } from '@/data/game';
+  import { update, watch } from '@/lib/storage';
+
+  const btns = document.querySelectorAll<HTMLButtonElement>('[data-role]');
+  btns.forEach((btn) =>
+    btn.addEventListener('click', () =>
+      update((p) => {
+        p.role = btn.dataset.role as Role;
+      })
+    )
+  );
+  watch((p) => btns.forEach((b) => b.setAttribute('aria-pressed', String((p.role ?? 'volunteer') === b.dataset.role))));
+</script>

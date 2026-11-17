@@ -38,6 +38,7 @@ export function initStepper(root: HTMLElement, onFinish: (r: StepperResult) => v
     quiz.dataset.answered = 'true';
     const isRight = option.hasAttribute('data-correct');
     if (isRight) correct += 1;
+    quiz.dataset.result = isRight ? 'right' : 'wrong';
 
     quiz.querySelectorAll<HTMLButtonElement>('[data-option]').forEach((b) => {
       b.disabled = true;
@@ -79,6 +80,7 @@ export function initStepper(root: HTMLElement, onFinish: (r: StepperResult) => v
     correct = 0;
     quizzes.forEach((q) => {
       delete q.dataset.answered;
+      delete q.dataset.result;
       q.querySelectorAll<HTMLButtonElement>('[data-option]').forEach((b) => {
         b.disabled = false;
         b.classList.remove('is-correct', 'is-wrong', 'is-dim');

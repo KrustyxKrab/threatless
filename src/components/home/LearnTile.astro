@@ -1,0 +1,52 @@
+---
+import { PATH } from '@/data/path';
+import Illo from '@/components/ui/Illo.astro';
+---
+
+<section class="kq-mode" aria-labelledby="learn-title" data-learn-tile data-ids={PATH.map((s) => s.id).join(',')} data-titles={PATH.map((s) => s.title).join('|')} data-hrefs={PATH.map((s) => s.href).join('|')}>
+  <Illo name="phishing" width={110} class="kq-mode__art" decorative />
+  <span class="kq-mode__tag">Learn</span>
+  <h2 id="learn-title" class="kq-h2">Spot a scam before it gets you</h2>
+  <p>Six short games, 2–4 minutes each. Play them before you get your work accounts – then a quick round every few months.</p>
+  <div class="kq-mode__dots" aria-hidden="true">{PATH.map(() => <span />)}</div>
+  <p style="font-weight:700; font-size:0.95rem"><span data-learn-summary>0 of {PATH.length} done</span> · <span data-learn-points>0</span> points</p>
+  <a class="kq-btn kq-btn--primary kq-btn--lg" href={PATH[0].href} data-learn-next>
+    <span data-learn-next-label>Start: {PATH[0].title}</span>
+    <span aria-hidden="true">→</span>
+  </a>
+  <a class="kq-btn kq-btn--ghost" href="/learn/">See your learning path</a>
+</section>
+
+<script>
+  import { isStepDone, nextStepIndex } from '@/lib/path-state';
+  import { pointsOf } from '@/lib/points';
+  import { watch } from '@/lib/storage';
+
+  const root = document.querySelector<HTMLElement>('[data-learn-tile]');
+  if (root) {
+    const ids = (root.dataset.ids ?? '').split(',');
+    const titles = (root.dataset.titles ?? '').split('|');
+    const hrefs = (root.dataset.hrefs ?? '').split('|');
+    const dots = [...root.querySelectorAll<HTMLElement>('.kq-mode__dots span')];
+    const link = root.querySelector<HTMLAnchorElement>('[data-learn-next]')!;
+    const label = root.querySelector<HTMLElement>('[data-learn-next-label]')!;
+
+    watch((p) => {
+      const next = nextStepIndex(ids, p);
+      const done = ids.filter((id) => isStepDone(id, p)).length;
+      dots.forEach((d, i) => {
+        d.classList.toggle('is-done', isStepDone(ids[i], p));
+        d.classList.toggle('is-next', i === next);
+      });
+      root.querySelector('[data-learn-summary]')!.textContent = `${done} of ${ids.length} done`;
+      root.querySelector('[data-learn-points]')!.textContent = String(pointsOf(p));
+      if (next === -1) {
+        link.href = '/learn/';
+        label.textContent = 'All done – play again';
+      } else {
+        link.href = hrefs[next];
+        label.textContent = `${done === 0 ? 'Start' : 'Continue'}: ${titles[next]}`;
+      }
+    });
+  }
+</script>

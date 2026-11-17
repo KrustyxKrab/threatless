@@ -1,20 +1,21 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import ProgressOverview from '@/components/home/ProgressOverview.astro';
-import HelpStrip from '@/components/home/HelpStrip.astro';
-import ModuleList from '@/components/learn/ModuleList.astro';
-import { MODULES } from '@/data/modules';
+import LearnTile from '@/components/home/LearnTile.astro';
+import HelpTile from '@/components/home/HelpTile.astro';
+import Illo from '@/components/ui/Illo.astro';
 ---
 
 <BaseLayout>
-  <ProgressOverview />
-  <HelpStrip />
-
-  <section style="margin-top: var(--kq-section)" aria-labelledby="lessons-title">
-    <div class="kq-section-head">
-      <h2 id="lessons-title" class="kq-h2">{MODULES.length} short lessons</h2>
-      <p class="kq-muted" style="max-width:36ch">3–4 minutes each. Read a little, then practise with real-looking examples.</p>
+  <div class="kq-home-hero">
+    <div style="display:grid; gap:0.75rem">
+      <h1 class="kq-display">Spot scams.<br />Get help fast.</h1>
+      <p class="kq-lead">Learn the warning signs in short games – and know exactly what to do when something goes wrong.</p>
     </div>
-    <ModuleList />
-  </section>
+    <Illo name="hero" width={260} class="kq-home-hero__art" eager decorative />
+  </div>
+
+  <div class="kq-modes">
+    <LearnTile />
+    <HelpTile />
+  </div>
 </BaseLayout>

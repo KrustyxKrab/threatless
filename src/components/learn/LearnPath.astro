@@ -1,0 +1,47 @@
+---
+/** Duolingo-style stepping stones. States (done / next / later) are painted client-side from local progress. */
+import { PATH } from '@/data/path';
+import { ART } from '@/data/art';
+import Illo from '@/components/ui/Illo.astro';
+
+/** gentle zig-zag, in % of the available swing */
+const SWING = [0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7];
+---
+
+<ol class="kq-path" data-path>
+  {
+    PATH.map((step, i) => (
+      <li class="kq-stone" data-stone={step.id} data-badge={step.badge} data-minutes={step.minutes} data-state="later" style={`--swing:${SWING[i % SWING.length]}`}>
+        <span class="kq-stone__bubble" aria-hidden="true">Start</span>
+        <a class="kq-stone__btn" href={step.href} style={`--art-bg:${ART[step.art].bg}`} aria-describedby={`stone-${step.id}`}>
+          <Illo name={step.art} width={96} decorative />
+          <span class="kq-stone__check" aria-hidden="true">✓</span>
+        </a>
+        <span class="kq-stone__label" id={`stone-${step.id}`}>
+          <strong>{step.title}</strong>
+          <span data-stone-meta>{step.minutes} min</span>
+        </span>
+      </li>
+    ))
+  }
+</ol>
+
+<script>
+  import { isStepDone, nextStepIndex } from '@/lib/path-state';
+  import { watch } from '@/lib/storage';
+
+  const stones = [...document.querySelectorAll<HTMLElement>('[data-stone]')];
+  const ids = stones.map((s) => s.dataset.stone!);
+
+  watch((p) => {
+    const next = nextStepIndex(ids, p);
+    stones.forEach((el, i) => {
+      const { stone: id = '', badge, minutes } = el.dataset;
+      const done = isStepDone(id, p);
+      const state = done ? 'done' : i === next ? 'next' : 'later';
+      el.dataset.state = state;
+      const meta = el.querySelector<HTMLElement>('[data-stone-meta]')!;
+      meta.textContent = done ? `Badge: ${badge}` : state === 'next' ? `${minutes} min · next up` : `${minutes} min`;
+    });
+  });
+</script>

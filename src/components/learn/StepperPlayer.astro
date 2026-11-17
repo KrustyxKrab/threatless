@@ -37,7 +37,20 @@ const art = isArtKey(module.id) ? module.id : 'phishing';
         <Illo name="done" width={260} class="kq-done__art" decorative />
         <p class="kq-eyebrow">Lesson done · {module.title}</p>
         <p class="kq-score" data-score tabindex="-1" data-step-title>0 / {module.quiz.length}</p>
-        <p class="kq-prose" data-result-summary>Your result is saved in this browser.</p>
+        <p class="kq-badge-earned">Badge: {module.badge} · <span data-result-points>+0</span> points</p>
+        <p class="kq-prose" data-result-summary></p>
+
+        <div class="kq-remember" data-remember hidden>
+          <p style="font-weight:800">Worth remembering</p>
+          <ul data-remember-list style="margin:0; padding-left:1.2rem; display:grid; gap:0.4rem"></ul>
+          <p class="kq-muted" style="font-size:0.9rem">Practise again any time – only your best try counts.</p>
+        </div>
+
+        <div class="kq-fell-for-it">
+          <p style="font-weight:800">Already fell for something like this?</p>
+          <p>Clicked a link, paid or typed your password? It can still be fixed – the faster, the better.</p>
+          <a class="kq-btn kq-btn--ghost" href="/report/">See what to do now →</a>
+        </div>
         <div class="kq-step-actions">
           {
             nextModule && (
@@ -67,6 +80,7 @@ const art = isArtKey(module.id) ? module.id : 'phishing';
 </div>
 
 <script>
+  import { XP_PER_CORRECT } from '@/data/game';
   import { initStepper } from '@/lib/stepper';
   import { update, watch } from '@/lib/storage';
 
@@ -87,10 +101,19 @@ const art = isArtKey(module.id) ? module.id : 'phishing';
       });
       if (summaryEl) {
         summaryEl.textContent =
-          correct === total
-            ? `All ${total} right. Great job – your result is saved in this browser.`
-            : `${correct} of ${total} right. Good start! Practise again or go on to the next lesson.`;
+          correct === total ? `All ${total} right. You’re hard to fool!` : `${correct} of ${total} right. Good start!`;
       }
+      root.querySelector('[data-result-points]')!.textContent = `+${correct * XP_PER_CORRECT}`;
+      const missed = [...root.querySelectorAll<HTMLElement>('[data-quiz][data-result="wrong"] [data-explain]')];
+      const remember = root.querySelector<HTMLElement>('[data-remember]')!;
+      remember.hidden = missed.length === 0;
+      root.querySelector('[data-remember-list]')!.replaceChildren(
+        ...missed.map((m) => {
+          const li = document.createElement('li');
+          li.textContent = m.textContent ?? '';
+          return li;
+        })
+      );
     });
   }
 </script>

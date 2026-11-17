@@ -11,10 +11,17 @@ export const ROLES: readonly { id: Role; label: string; hint: string }[] = [
 
 export const XP_PER_CORRECT = 10;
 
-const RANKS = [
-  { min: 0, label: 'Rookie' },
+export const RANKS = [
+  { min: 0, label: 'Beginner' },
   { min: 60, label: 'Spotter' },
   { min: 140, label: 'Guardian' },
+  { min: 220, label: 'Scam Expert' },
 ] as const;
 
-export const rankFor = (xp: number): string => [...RANKS].reverse().find((r) => xp >= r.min)!.label;
+export const rankFor = (xp: number) => [...RANKS].reverse().find((r) => xp >= r.min)!;
+
+/** Next rank and how many points are missing, or null at the top. */
+export const nextRank = (xp: number) => {
+  const next = RANKS.find((r) => r.min > xp);
+  return next ? { label: next.label, missing: next.min - xp } : null;
+};

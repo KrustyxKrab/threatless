@@ -1,0 +1,41 @@
+---
+/** Points, rank and badge count. Filled client-side. */
+import { PATH } from '@/data/path';
+---
+
+<div class="kq-points" data-points data-ids={PATH.map((s) => s.id).join(',')}>
+  <div class="kq-points__main">
+    <span class="kq-points__value" data-points-value>0</span>
+    <span class="kq-points__unit">points</span>
+  </div>
+  <div class="kq-points__side">
+    <strong data-points-rank>Beginner</strong>
+    <span class="kq-muted" data-points-badges>0 of {PATH.length} badges</span>
+    <div class="kq-progress" aria-hidden="true"><div class="kq-progress__bar" data-points-bar></div></div>
+    <span class="kq-muted" data-points-next></span>
+  </div>
+</div>
+
+<script>
+  import { nextRank, rankFor } from '@/data/game';
+  import { isStepDone } from '@/lib/path-state';
+  import { pointsOf } from '@/lib/points';
+  import { watch } from '@/lib/storage';
+
+  document.querySelectorAll<HTMLElement>('[data-points]').forEach((root) => {
+    const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+    watch((p) => {
+      const pts = pointsOf(p);
+      const rank = rankFor(pts);
+      const next = nextRank(pts);
+      const ids = (root.dataset.ids ?? '').split(',');
+      const badges = ids.filter((id) => isStepDone(id, p)).length;
+      $('[data-points-value]').textContent = String(pts);
+      $('[data-points-rank]').textContent = rank.label;
+      $('[data-points-badges]').textContent = `${badges} of ${ids.length} badges`;
+      $('[data-points-next]').textContent = next ? `${next.missing} more to ${next.label}` : 'Top rank reached';
+      const span = next ? next.missing + (pts - rank.min) : 1;
+      $('[data-points-bar]').style.setProperty('--value', `${next ? ((pts - rank.min) / span) * 100 : 100}%`);
+    });
+  });
+</script>
